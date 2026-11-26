@@ -119,6 +119,9 @@ dl.kv dt{color:var(--muted)}dl.kv dd{margin:0;font-weight:600;font-variant-numer
 dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:700;margin-top:8px}dl.gl dd{margin:0;color:var(--muted);font-size:15px}
 .search{font:500 16px var(--f-ui);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);width:100%}
 .sub2{position:static;grid-template-columns:1fr 1fr!important}
+.sub3{position:static;grid-template-columns:1fr 1fr 1fr!important}
+.weak{border-left:3px solid var(--bad);padding-left:8px}
+.prog .line.tap{cursor:pointer}
 .confirm{color:var(--bad)}
 @media (max-width:440px){.seg{grid-template-columns:repeat(4,1fr)}.seg button{padding-left:2px;padding-right:2px;font-size:13px}}
 @media (max-width:380px){.seg button{font-size:12px}.q{font-size:17px}}
@@ -145,7 +148,7 @@ dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:7
 
   </nav>
   <main id="view"></main>
-  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 11.</p>
+  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 12.</p>
 </div>
 
 <script>
@@ -429,6 +432,50 @@ const Q = [
 {m:"tes",q:"Jak se pozná přeplnění recyklační láhve v praxi?",a:["Podle váhy – láhev se vždy plní na váze do max. hmotnosti", "Podle zvuku", "Podle teploty láhve", "Podle manometru"],e:"Tlak v láhvi neukazuje množství kapaliny.",s:""},
 ];
 
+// Okruhy přílohy I prov. nař. (EU) 2024/2215 a přiřazení otázek.
+// Zkouška: vždy 1–5, 10, 11 + podle kategorie 12 (A1/A2), 13 (B), 14 (C) + aspoň jeden z 6–9 (předem nevíš který).
+const OKRUHY = {
+  1:"Legislativa a základy termodynamiky",
+  2:"Vliv chladiv na prostředí a předpisy",
+  3:"Kontroly před uvedením do provozu, po opravě a za provozu",
+  4:"Kontrola těsnosti",
+  5:"Šetrné zacházení se systémem a chladivem",
+  6:"Kompresory",
+  7:"Kondenzátory",
+  8:"Výparníky",
+  9:"Expanzní ventily a další komponenty",
+  10:"Potrubí – těsný systém",
+  11:"Alternativní technologie a bezpečné zacházení",
+  12:"Uhlovodíky – instalace a servis",
+  13:"CO₂ (R744) – instalace a servis",
+  14:"NH₃ (R717) – instalace a servis"
+};
+const OKR_CAT = {
+  "A1/A2":[1,2,3,4,5,6,7,8,9,10,11,12],
+  "B":[1,2,3,4,5,6,7,8,9,10,11,13],
+  "C":[1,2,3,4,5,6,7,8,9,10,11,14]
+};
+// výchozí okruh podle modulu
+const OKR_DEF = {leg:1,env:2,fyz:1,kom:9,tes:3,hor:12,co2:13,nh3:14,pot:10,bez:5,ene:3,sit:3};
+// výjimky podle pořadí otázky v bance (index = číslo za pomlčkou v id)
+const OKR_OVR = {
+  // env
+  37:11,38:11,39:1,41:11,
+  // kom
+  54:6,55:6,57:10,221:6,225:6,226:6,227:6,230:6,231:6,
+  // tes
+  59:4,62:5,63:5,65:5,99:4,100:5,101:5,102:4,239:4,240:4,241:4,242:5,
+  // hor
+  70:11,113:11,114:11,145:11,146:11,148:4,149:4,150:4,151:4,152:4,153:3,154:3,
+  // bez
+  121:11,124:3,195:3,196:3,197:3,198:11,201:11,
+  // ene
+  125:7,127:8,204:8,
+  // sit
+  163:4,167:4,168:4,170:7,171:7,172:9,173:11,174:1,175:5,176:1,177:12,178:5,179:4,180:4,
+  182:7,183:4,184:10,186:12,187:1,189:5,190:7,191:9,192:5
+};
+
 // Lekce: klíčové body ke každému okruhu
 const LESSONS = {
 leg: ["Nařízení (EU) 2024/573 platí od 11. 3. 2024 a nahradilo 517/2014. Certifikaci osob upravuje prováděcí nařízení 2024/2215, v ČR zákon 73/2012 Sb.",
@@ -585,7 +632,7 @@ function leakInterval(t,lds,hfoKg){ // vrací měsíce nebo null
 }
 // </calc>
 const $=s=>document.querySelector(s), view=$("#view");
-Q.forEach((q,i)=>q.id=q.m+"-"+i);
+Q.forEach((q,i)=>{q.id=q.m+"-"+i;q.o=OKR_OVR[i]||OKR_DEF[q.m]});
 const KEY="fplyny-v1";const A_MODS=["leg","env","fyz","kom","tes","pot","hor","bez","ene","sit"];
 let S={box:{},seen:{},tm:{},mods:Object.keys(MODULES),tests:[]};
 try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r))}catch(e){}
@@ -695,7 +742,7 @@ function bindChips(rerender){
 function renderQuestion(q,idx,total,onDone,showFeedback=true){
   const opts=shuffle(q.a.map((t,i)=>({t,ok:i===0})));
   view.innerHTML=`<div class="card">
-    <div class="meta"><span class="tag">${MODULES[q.m].cat}</span><span>${MODULES[q.m].name}</span><span style="font-family:var(--f-num)">${idx+1}/${total}</span></div>
+    <div class="meta"><span class="tag">${MODULES[q.m].cat}</span><span>${MODULES[q.m].name} · okruh ${q.o}</span><span style="font-family:var(--f-num)">${idx+1}/${total}</span></div>
     <div class="bar"><i style="width:${(idx/total)*100}%"></i></div>
     <p class="q">${esc(q.q)}</p>
     <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><b>${"ABCD"[i]}</b><span>${esc(o.t)}</span></button>`).join("")}</div>
@@ -724,14 +771,14 @@ function lesson(m){
 }
 function learnHome(){
   const p=pool(),known=p.filter(q=>(S.box[q.id]||0)>=3).length;
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${modChips()}
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${readyMini()}${modChips()}
   <div class="card"><p class="label">Procvičování</p><p class="hint">10 otázek. Nejdřív přijdou ty, které neznáš nebo jsi je dlouho neviděl. Chybné se vrací častěji.</p>
   <div class="meta"><span>Zvládnuto ${known} z ${p.length}</span><button class="chip" id="toStats">Celkový pokrok</button></div><div class="bar"><i style="width:${p.length?known/p.length*100:0}%"></i></div>
   <button class="btn" id="go">Začít procvičování</button></div>
   <div class="card"><p class="label">Lekce</p><p class="hint">Krátký výklad k okruhu, pak rovnou otázky jen z něj.</p>
   <div class="chips">${Object.entries(MODULES).map(([k,v])=>`<button class="chip" data-les="${k}">${v.name}</button>`).join("")}</div></div></div>`;
   view.querySelectorAll("[data-les]").forEach(b=>b.onclick=()=>lesson(b.dataset.les));
-  bindChips(learnHome); $("#go").onclick=()=>runLearn(pickLearn(10));$("#toStats").onclick=()=>{document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",false));stats()};
+  bindChips(learnHome); bindReadyMini(); $("#go").onclick=()=>runLearn(pickLearn(10));$("#toStats").onclick=()=>{document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",false));stats()};
 }
 function runLearn(list){let i=0,ok=0;
   const step=()=>{ if(i>=list.length){view.innerHTML=`<div class="card"><p class="label">Hotovo</p><p class="big">${ok}/${list.length}</p><p class="hint">Chybné otázky se ti objeví znovu v příštím kole.</p><div class="row"><button class="btn" id="again">Další kolo</button><button class="btn ghost" id="home">Zpět</button></div></div>`;
@@ -966,6 +1013,39 @@ function calc(){
   ["ref","ps","ts","pk","tk"].forEach(id=>$("#"+id).addEventListener("input",upd2));upd2();
   exBind();
 }
+// ── připravenost podle okruhů přílohy I ──
+const RCAT_KEY="fplyny-rcat";
+function rcat(){try{const c=localStorage.getItem(RCAT_KEY);return OKR_CAT[c]?c:"A1/A2"}catch(e){return "A1/A2"}}
+function qScore(q){const b=S.box[q.id]||0;return b>=3?1:b===2?.5:0}
+function readiness(cat){
+  const rows=OKR_CAT[cat].map(n=>{const p=Q.filter(q=>q.o===n);const sc=p.length?p.reduce((a,q)=>a+qScore(q),0)/p.length:0;
+    return {n,name:OKRUHY[n],cnt:p.length,kn:p.filter(q=>(S.box[q.id]||0)>=3).length,sc}});
+  const r=rows.filter(x=>x.cnt);const total=r.length?r.reduce((a,x)=>a+x.sc,0)/r.length:0;
+  const weak=r.slice().sort((a,b)=>a.sc-b.sc||a.n-b.n)[0];
+  return {rows,total,weak}}
+function okrPractice(n){runLearn(Q.filter(q=>q.o===n).sort((a,b)=>((S.box[a.id]||0)-(S.box[b.id]||0))||((S.seen[a.id]||0)-(S.seen[b.id]||0))||Math.random()-.5).slice(0,10))}
+const pct=x=>Math.round(x*100)+" %";
+function readyMini(){const c=rcat(),R=readiness(c);
+  return `<div class="card"><p class="label">Připravenost ${c}</p>
+  <div class="meta"><span class="big" style="margin:0">${pct(R.total)}</span><button class="chip" id="rDet">Podle okruhů</button></div>
+  <div class="bar"><i style="width:${R.total*100}%"></i></div>
+  <p class="hint">Nejslabší: okruh ${R.weak.n} ${esc(R.weak.name)} (${pct(R.weak.sc)})</p>
+  <button class="btn" id="rWeak">Procvičit nejslabší okruh</button></div>`}
+function bindReadyMini(){$("#rWeak").onclick=()=>okrPractice(readiness(rcat()).weak.n);
+  $("#rDet").onclick=()=>{document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",false));stats()}}
+function readyCard(){const c=rcat(),R=readiness(c);
+  return `<div class="card"><p class="label">Připravenost ke zkoušce</p>
+  <div class="seg sub3">${Object.keys(OKR_CAT).map(k=>`<button data-rc="${k}" aria-pressed="${k===c}">${k}</button>`).join("")}</div>
+  <p class="big">${pct(R.total)}</p>
+  <p class="hint">Průměr okruhů, které zkouška ${c} pokrývá podle přílohy I nař. 2024/2215: vždy 1–5, 10, 11 a ${c==="A1/A2"?"12":c==="B"?"13":"14"}, z okruhů 6–9 aspoň jeden (předem nevíš který). Zvládnutá otázka = 1, napůl (2× správně) = ½.</p>
+  <p class="hint"><b>Nejslabší:</b> okruh ${R.weak.n} ${esc(R.weak.name)} – ${pct(R.weak.sc)}</p>
+  <button class="btn" id="rWeak">Procvičit nejslabší okruh</button>
+  <div class="prog" style="margin-top:12px">${R.rows.map(x=>`<div class="line tap${x.n===R.weak.n?" weak":""}" data-okr="${x.n}"><span>${x.n}. ${esc(x.name)}</span><em>${x.cnt?pct(x.sc)+" · "+x.kn+"/"+x.cnt:"bez otázek"}</em><div class="bar"><i style="width:${x.sc*100}%"></i></div></div>`).join("")}</div>
+  <p class="note">Klepnutím na okruh procvičíš 10 otázek z něj. Přiřazení otázek k okruhům je můj odhad, ne oficiální.</p></div>`}
+function bindReadyCard(){
+  view.querySelectorAll("[data-rc]").forEach(b=>b.onclick=()=>{try{localStorage.setItem(RCAT_KEY,b.dataset.rc)}catch(e){}stats()});
+  view.querySelectorAll("[data-okr]").forEach(b=>b.onclick=()=>okrPractice(+b.dataset.okr));
+  $("#rWeak").onclick=()=>okrPractice(readiness(rcat()).weak.n)}
 // ── pokrok ──
 let resetArm=false;
 function confCard(){
@@ -979,11 +1059,12 @@ function confCard(){
   ${om?`<button class="btn bad" id="omyl">Procvičit chyby s jistotou (${om})</button>`:`<p class="hint">Žádné chyby s jistotou.</p>`}</div>`}
 function stats(){
   const tot=Q.length,known=Q.filter(q=>(S.box[q.id]||0)>=3).length;
-  view.innerHTML=`<div class="card"><p class="label">Celkem zvládnuto</p><p class="big">${Math.round(known/tot*100)} %</p><p class="hint">${known} z ${tot} otázek (zvládnutá = 3× po sobě správně)</p>
+  view.innerHTML=`${readyCard()}<div class="card"><p class="label">Celkem zvládnuto</p><p class="big">${Math.round(known/tot*100)} %</p><p class="hint">${known} z ${tot} otázek (zvládnutá = 3× po sobě správně)</p>
   <div class="prog">${Object.entries(MODULES).map(([k,v])=>{const p=Q.filter(q=>q.m===k),kn=p.filter(q=>(S.box[q.id]||0)>=3).length;
   return `<div class="line"><span>${v.name} <span class="tag">${v.cat}</span></span><em>${kn}/${p.length}</em><div class="bar"><i style="width:${kn/p.length*100}%"></i></div></div>`}).join("")}</div>
   <button class="btn ghost" id="reset">${resetArm?"Klepni znovu pro smazání pokroku":"Smazat pokrok"}</button></div>
   ${confCard()}`;
+  bindReadyCard();
   $("#reset").onclick=()=>{if(resetArm){S.box={};S.seen={};S.tm={};S.tests=[];save();resetArm=false}else resetArm=true;stats()};
   const om=Q.filter(q=>lastCls(q)==="omyl");if($("#omyl"))$("#omyl").onclick=()=>runLearn(om);
 }
