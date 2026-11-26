@@ -59,6 +59,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
 .opt:disabled{cursor:default}
 .vacg{width:100%;max-width:460px;display:block;margin:4px auto 0}.vacg .gl{stroke:var(--line);stroke-width:1}.vacg .ax{font:500 9px var(--f-num);fill:var(--muted)}.vacg .lim{stroke:var(--ok);stroke-width:1.2;stroke-dasharray:4 3}.vacg .lim2{fill:var(--ok)}.vacg .cv{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.mgg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.mgw{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--muted)}.mgw.big{grid-column:1/-1}.mgw span{font-size:12px;line-height:1.3;-webkit-text-size-adjust:none;text-size-adjust:none}.mgw svg{width:100%;max-width:340px;display:block}.mgs .gb{fill:#2b2f36}.mgs.lp .gb{fill:#1f6fd1}.mgs.hp .gb{fill:#d0342c}.mgs .gf{fill:#fdfdfb}.mgs .gt{stroke:#222;stroke-width:.8}.mgs .gm{stroke-width:1.6}.mgs .gp{font:600 10px var(--f-num);fill:#111}.mgs .gtt{stroke:#c26a00;stroke-width:.9}.mgs .gtl{font:600 8.5px var(--f-num);fill:#c26a00}.mgs .gu{font:600 9px var(--f-num);fill:#555}.mgs .gn{stroke:#111;stroke-width:2.2;stroke-linecap:round}.mgs .gnc{fill:#111}.phg{margin-top:10px}.phg .dome{fill:none;stroke:var(--fg);stroke-width:1.4}.phg .rg{font-style:italic}.phg .cyc{fill:color-mix(in srgb,var(--accent) 12%,transparent);stroke:var(--accent);stroke-width:2;stroke-linejoin:round}.phg .cpt{fill:var(--accent)}.phg .cpl{font:700 11px var(--f-num);fill:var(--accent)}
 .prsm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prsm .vacm b{font-size:26px}.prsm .vacm b.prst{font-size:17px;line-height:1.3}.vacg .exl{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 4}.vacg .psl{stroke:var(--bad,#d33);stroke-width:1.2;stroke-dasharray:4 3}.vacg .psl2{fill:var(--bad,#d33)}
 .vacm{margin-top:8px;background:#0f1a14;color:#7dffb0;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-num)}.vacm span{font-size:12px;opacity:.8}.vacm b{font-size:30px;line-height:1.15}.vacm small{font-size:12px;opacity:.85}
 .simg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
@@ -658,14 +659,108 @@ function prsDraw(pickId){const c=prsCur,b=$("#prsbody");if(!b||!c)return;const a
  else{$("#prsnext").onclick=prsNew;$("#prsokr").onclick=()=>{document.querySelectorAll("#nav button").forEach(n=>n.setAttribute("aria-pressed",n.dataset.v==="learn"));okrPractice(F.o)}}}
 function prsCard(){return `<div class="card" id="prscard"><p class="label">Tlaková zkouška dusíkem</p><p class="hint">Přepočti tlak na teplotu v absolutních hodnotách (p₁/T₁ = p₂/T₂) a rozhodni, jestli okruh drží.</p><div id="prsbody"></div></div>`}
 function prsBind(){if(prsCur)prsDraw(null);else prsNew()}
+/*PH*/
+// ── manometry a log p-h ──
+// Analogový manifold se stupnicí teploty sytosti (sání = rosný bod, výtlak = bod varu) a oběh 1–4 v log p-h (data PH z CoolProp, účinnost komprese 0,7).
+const MNG_REF={R32:{t0:[-3,12],tk:[36,55],lp:[-1,25],hp:[-1,50],u:"Split"},R410A:{t0:[-3,12],tk:[36,55],lp:[-1,25],hp:[-1,50],u:"Split"},
+ R134a:{t0:[-12,5],tk:[32,50],lp:[-1,10],hp:[-1,25],u:"Vitrína"},R290:{t0:[-22,3],tk:[32,50],lp:[-1,10],hp:[-1,25],u:"Mraz. vitrína"}};
+const MNG_SEG={"12":"1–2 komprese","23":"2–3 kondenzace","34":"3–4 škrcení","41":"4–1 vypařování"};
+const MNG_SQ=[["Chladivo odebírá teplo z ochlazovaného prostoru.","41"],["Chladivo předává teplo do okolí (venkovní vzduch, voda).","23"],["Entalpie se nemění, tlak a teplota klesají.","34"],["Roste tlak i entalpie – dodává se práce kompresoru.","12"],
+ ["Děje se v expanzním ventilu.","34"],["Na konci úseku vstupuje přehřátá pára do kompresoru.","41"],["Začíná v nejteplejším místě okruhu (výtlak) a končí podchlazenou kapalinou.","23"],["Ve výparníku se směs kapaliny a páry mění na páru.","41"],["Odvádí se přehřátí, pára kondenzuje a kapalina se podchlazuje.","23"],["V log p-h je to svislá čára.","34"]];
+const MNG_K={t0:["Odečti t₀",8],tk:["Odečti t_k",7],sh:["Přehřátí",9],sc:["Podchlazení",7],seg:["Úsek v p-h",1],ent:["Entalpie",1]};
+let mngKind="vse",mngCur=null,mngScore=[0,0];
+const lerpA=(xs,ys,x)=>{let i=0;while(i<xs.length-2&&x>xs[i+1])i++;const f=(x-xs[i])/(xs[i+1]-xs[i]);return ys[i]+(ys[i+1]-ys[i])*f};
+const idxF=(xs,x)=>{let i=0;while(i<xs.length-2&&x>xs[i+1])i++;return [i,(x-xs[i])/(xs[i+1]-xs[i])]};
+function phH1(k,t0,sh){const g=PH[k].h1,[i,a]=idxF(PH_T0,t0),[j,b]=idxF(PH_SH,sh);return (g[i][j]*(1-b)+g[i][j+1]*b)*(1-a)+(g[i+1][j]*(1-b)+g[i+1][j+1]*b)*a}
+function phG3(g,t0,sh,tk){const [i,a]=idxF(PH_T0,t0),[j,b]=idxF(PH_SH,sh),[l,c]=idxF(PH_TK,tk);const v=(I,J)=>g[I][J][l]*(1-c)+g[I][J][l+1]*c;
+ return (v(i,j)*(1-b)+v(i,j+1)*b)*(1-a)+(v(i+1,j)*(1-b)+v(i+1,j+1)*b)*a}
+const pG=(arr,t,r)=>lerpA(r.t,arr,t); // přetlak z tabulky SAT
+function mngNew(){const k=pick(Object.keys(MNG_REF)),R=MNG_REF[k],r=SAT[k],D=PH[k].d,c={k};
+ c.kind=mngKind==="vse"?pick(Object.keys(MNG_K)):mngKind;
+ c.t0=ri(R.t0[0],R.t0[1]);c.tk=ri(R.tk[0],R.tk[1]);c.sh=ri(3,12);c.sc=ri(2,8);
+ c.ts=Math.round((c.t0+c.sh+rnd(-0.4,0.4))*10)/10;c.sh=c.ts-c.t0;c.tl=Math.round((c.tk-c.sc+rnd(-0.4,0.4))*10)/10;c.sc=c.tk-c.tl;
+ c.p0=pG(r.d,c.t0,r);c.pk=pG(r.b,c.tk,r);
+ c.h1=phH1(k,c.t0,c.sh);c.h2=phG3(PH[k].h2,c.t0,c.sh,c.tk);c.t2=phG3(PH[k].t2,c.t0,c.sh,c.tk);c.h3=lerpA(D.t,D.hl,c.tl);
+ c.q0=c.h1-c.h3;c.w=c.h2-c.h1;c.eer=c.q0/c.w;
+ if(c.kind==="seg")c.sq=pick(MNG_SQ);
+ if(c.kind==="ent")c.ek=pick(["q0","w","eer"]);
+ mngCur=c;mngDraw(null)}
+function gauge(c,hp){const R=MNG_REF[c.k],r=SAT[c.k],[v0,v1]=hp?R.hp:R.lp,S=180,C=S/2,ang=v=>(-135+270*(v-v0)/(v1-v0))*Math.PI/180;
+ const P=(v,rad)=>[C+rad*Math.sin(ang(v)),C-rad*Math.cos(ang(v))],span=v1-v0,maj=span>40?10:span>15?5:2,mi=span>40?2:span>15?1:0.5;let s="";
+ for(let v=v0;v<=v1+1e-6;v+=mi){const m=Math.abs(v/maj-Math.round(v/maj))<1e-6,[x1,y1]=P(v,84),[x2,y2]=P(v,m?74:79);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="gt${m?" gm":""}"/>`;
+  if(m){const [x,y]=P(v,64);s+=`<text x="${x.toFixed(1)}" y="${(y+3.5).toFixed(1)}" class="gp" text-anchor="middle">${v}</text>`}}
+ const arr=hp?r.b:r.d;
+ const deg=v=>270*(v-v0)/(v1-v0);let lt=-99,ll=-99;
+ r.t.forEach((t,i)=>{const pv=arr[i];if(pv<v0||pv>v1||t%2)return;const a=deg(pv),m=t%10===0;
+  if(m&&a-ll>=13){ll=a;lt=a;const [x1,y1]=P(pv,51),[x2,y2]=P(pv,44),[x,y]=P(pv,36);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="gtt"/><text x="${x.toFixed(1)}" y="${(y+3).toFixed(1)}" class="gtl" text-anchor="middle">${t}</text>`}
+  else if(a-lt>=2.6&&a-ll>=2.6){lt=a;const [x1,y1]=P(pv,51),[x2,y2]=P(pv,47);s+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="gtt"/>`}});
+ const pv=hp?c.pk:c.p0,[nx,ny]=P(pv,72);
+ return `<svg viewBox="0 0 ${S} ${S}" class="mgs ${hp?"hp":"lp"}" role="img" aria-label="${hp?"Vysokotlaký":"Nízkotlaký"} manometr">
+ <circle cx="${C}" cy="${C}" r="88" class="gb"/><circle cx="${C}" cy="${C}" r="84" class="gf"/>${s}
+ <text x="${C}" y="${C+26}" class="gu" text-anchor="middle">bar</text><text x="${C}" y="${C+38}" class="gtl" text-anchor="middle">°C ${c.k}</text>
+ <line x1="${C}" y1="${C}" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" class="gn"/><circle cx="${C}" cy="${C}" r="5" class="gnc"/></svg>`}
+function phDiag(c){const D=PH[c.k].d,W=320,H=210,L=34,R=8,T=10,B=26,iw=W-L-R,ih=H-T-B;
+ const hmin=Math.floor((D.hl[0]-10)/50)*50,hmax=Math.ceil((Math.max(...D.hv,c.h2)+30)/50)*50,lo=Math.log10(D.pv[0]*0.9),hi=Math.log10(PH[c.k].pc*1.25);
+ const x=h=>L+(h-hmin)/(hmax-hmin)*iw,y=p=>T+(hi-Math.log10(p))/(hi-lo)*ih,pa=g=>g+1.013;
+ const dome=D.hl.map((h,i)=>[x(h),y(D.pl[i])]).concat([[x(PH[c.k].hc),y(PH[c.k].pc)]]).concat(D.hv.map((h,i)=>[x(h),y(D.pv[i])]).reverse());
+ const pt={1:[c.h1,pa(c.p0)],2:[c.h2,pa(c.pk)],3:[c.h3,pa(c.pk)],4:[c.h3,pa(c.p0)]};const q=n=>[x(pt[n][0]),y(pt[n][1])];
+ const pts=[1,2,3,4,1].map(n=>q(n).map(v=>v.toFixed(1)).join(",")).join(" ");
+ const pt_=[0.5,1,2,5,10,20,50,100].filter(p=>Math.log10(p)>=lo&&Math.log10(p)<=hi),ht=[];for(let h=hmin;h<=hmax;h+=100)ht.push(h);
+ const lab={1:[6,4,"start"],2:[6,-4,"start"],3:[-6,-4,"end"],4:[-6,12,"end"]};const mid=D.t.length>>1;
+ return `<svg viewBox="0 0 ${W} ${H}" class="vacg phg" role="img" aria-label="Oběh v diagramu log p-h">
+ ${pt_.map(p=>`<line x1="${L}" x2="${W-R}" y1="${y(p)}" y2="${y(p)}" class="gl"/><text x="${L-4}" y="${y(p)+3}" class="ax" text-anchor="end">${String(p).replace(".",",")}</text>`).join("")}
+ ${ht.map(h=>`<line x1="${x(h)}" x2="${x(h)}" y1="${T}" y2="${T+ih}" class="gl"/><text x="${x(h)}" y="${H-12}" class="ax" text-anchor="middle">${h}</text>`).join("")}
+ <text x="${W-R}" y="${H-2}" class="ax" text-anchor="end">h [kJ/kg]</text><text x="2" y="${T-2}" class="ax">bar abs</text>
+ <polyline points="${dome.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ")}" class="dome"/>
+ <text x="${x(D.hl[mid])-4}" y="${y(D.pl[mid])}" class="ax rg" text-anchor="end">kapalina</text>
+ <text x="${(x(D.hl[4])+x(D.hv[4]))/2}" y="${y(D.pl[4])-6}" class="ax rg" text-anchor="middle">mokrá pára</text>
+ <text x="${W-R-2}" y="${y(PH[c.k].pc*0.85)}" class="ax rg" text-anchor="end">přehřátá pára</text>
+ <polyline points="${pts}" class="cyc"/>
+ ${[1,2,3,4].map(n=>{const [a,b]=q(n),[dx,dy,an]=lab[n];return `<circle cx="${a.toFixed(1)}" cy="${b.toFixed(1)}" r="3.2" class="cpt"/><text x="${(a+dx).toFixed(1)}" y="${(b+dy).toFixed(1)}" class="cpl" text-anchor="${an}">${n}</text>`}).join("")}</svg>`}
+function mngTask(c){const K=c.kind;
+ if(K==="t0")return{t:`Odečti z <b>modrého</b> manometru vypařovací teplotu t₀ (vnitřní stupnice ${c.k}).`,a:c.t0,u:"°C",tol:1.5};
+ if(K==="tk")return{t:`Odečti z <b>červeného</b> manometru kondenzační teplotu t<sub>k</sub> (vnitřní stupnice ${c.k}).`,a:c.tk,u:"°C",tol:1.5};
+ if(K==="sh")return{t:`Teploměr na sacím potrubí ukazuje <b>${cz1(c.ts)} °C</b>. Jaké je přehřátí? (t₀ odečti z modrého manometru)`,a:c.sh,u:"K",tol:1.6};
+ if(K==="sc")return{t:`Teploměr na kapalinovém potrubí ukazuje <b>${cz1(c.tl)} °C</b>. Jaké je podchlazení? (t<sub>k</sub> odečti z červeného manometru)`,a:c.sc,u:"K",tol:1.6};
+ if(K==="seg")return{t:esc(c.sq[0])+" Který úsek oběhu to je?",opts:Object.keys(MNG_SEG),ok:c.sq[1]};
+ const hs=`h₁ = ${cz(c.h1,0)}, h₂ = ${cz(c.h2,0)}, h₃ = h₄ = ${cz(c.h3,0)} kJ/kg.`;
+ if(c.ek==="q0")return{t:`Z diagramu: ${hs} Jaký je chladicí účinek q₀ (kJ/kg)?`,a:Math.round(c.h1)-Math.round(c.h3),u:"kJ/kg",tol:2};
+ if(c.ek==="w")return{t:`Z diagramu: ${hs} Jakou práci dodá kompresor 1 kg chladiva?`,a:Math.round(c.h2)-Math.round(c.h1),u:"kJ/kg",tol:2};
+ return{t:`Z diagramu: ${hs} Jaký je teoretický EER oběhu (q₀ / w)?`,a:(Math.round(c.h1)-Math.round(c.h3))/(Math.round(c.h2)-Math.round(c.h1)),u:"",tol:0.1}}
+function mngDraw(res){const c=mngCur,b=$("#mngbody");if(!b||!c)return;const tk=mngTask(c),ans=res!=null,o=MNG_K[c.kind][1];
+ b.innerHTML=`<p class="tag" style="display:inline-block;margin-top:8px">${esc(MNG_REF[c.k].u)} ${c.k} · ${MNG_K[c.kind][0]} · správně ${mngScore[0]}/${mngScore[1]}</p>
+ <div class="mgg"><button class="mgw" data-mg="0" aria-label="Zvětšit nízkotlaký manometr">${gauge(c,0)}<span>Sání (NT)</span></button><button class="mgw" data-mg="1" aria-label="Zvětšit vysokotlaký manometr">${gauge(c,1)}<span>Výtlak / kapalina (VT)</span></button></div>
+ <p class="note" style="margin:2px 0 0">Klepnutím manometr zvětšíš. Vnější stupnice přetlak v bar, vnitřní teplota sytosti v °C.</p>
+ ${phDiag(c)}
+ <p style="font-size:17px;line-height:1.45;margin:8px 0">${tk.t}</p>
+ ${tk.opts?`<div class="opts">${tk.opts.map(s=>{const cls=ans?(s===tk.ok?" ok":s===res?" bad":""):"";return `<button class="opt${cls}" data-mgo="${s}"${ans?" disabled":""}>${MNG_SEG[s]}</button>`}).join("")}</div>`:
+  `<div class="calc" style="grid-template-columns:1fr auto;align-items:end"><label for="mngin">Výsledek${tk.u?" ["+tk.u+"]":""}<input id="mngin" type="text" inputmode="decimal" autocomplete="off"${ans?` value="${esc(String(res))}" disabled`:""}></label><button class="btn" id="mngok"${ans?" disabled":""}>Zkontrolovat</button></div>`}
+ <div id="mngres"></div>`;
+ b.querySelectorAll("[data-mg]").forEach(x=>x.onclick=()=>x.classList.toggle("big"));
+ const done=ok=>{mngScore[1]++;if(ok)mngScore[0]++;const pa=g=>cz(g+1.013,2);
+  $("#mngres").innerHTML=`<div class="expl${ok?"":" wrong"}" style="margin-top:10px"><b>${ok?"Správně.":"Chyba."}</b> <span class="tag">okruh ${o}</span>
+  ${tk.opts?"":` Výsledek: <b>${cz(tk.a,tk.u?1:2)} ${tk.u}</b>.`}
+  <p style="margin:6px 0 0"><b>Sání:</b> ${cz1(c.p0)} bar přetlak (${pa(c.p0)} bar abs) → t₀ = ${c.t0} °C (rosný bod), sání ${cz1(c.ts)} °C → přehřátí ${cz1(c.sh)} K.</p>
+  <p style="margin:4px 0 0"><b>Výtlak:</b> ${cz1(c.pk)} bar přetlak (${pa(c.pk)} bar abs) → t<sub>k</sub> = ${c.tk} °C (bod varu), kapalina ${cz1(c.tl)} °C → podchlazení ${cz1(c.sc)} K. Teplota výtlaku ≈ ${cz(c.t2,0)} °C.</p>
+  <p style="margin:4px 0 0"><b>Oběh:</b> 1–2 komprese (h₁ ${cz(c.h1,0)} → h₂ ${cz(c.h2,0)} kJ/kg), 2–3 kondenzace (odvedení přehřátí, kondenzace, podchlazení), 3–4 škrcení (h₃ = h₄ = ${cz(c.h3,0)}), 4–1 vypařování a přehřátí. q₀ = h₁ − h₄ = ${cz(c.h1-c.h3,0)} kJ/kg, w = h₂ − h₁ = ${cz(c.w,0)} kJ/kg, EER ≈ ${cz(c.eer,1)}.</p></div>
+  <div class="row" style="margin-top:10px"><button class="btn" id="mngnext">Další úloha</button><button class="btn ghost" id="mngokr">Procvičit okruh ${o}</button></div>
+  <p class="note">Okruh ${o}: ${esc(OKRUHY[o])}. Teploty sytosti a entalpie z CoolProp, komprese s účinností 0,7 – hodnoty modelové.</p>`;
+  $("#mngnext").onclick=mngNew;$("#mngokr").onclick=()=>{document.querySelectorAll("#nav button").forEach(n=>n.setAttribute("aria-pressed",n.dataset.v==="learn"));okrPractice(o)};
+  b.querySelectorAll("[data-mgo],#mngok,#mngin").forEach(x=>x.disabled=true)};
+ if(ans)return;
+ if(tk.opts)b.querySelectorAll("[data-mgo]").forEach(x=>x.onclick=()=>{const ok=x.dataset.mgo===tk.ok;x.classList.add(ok?"ok":"bad");if(!ok)b.querySelector(`[data-mgo="${tk.ok}"]`).classList.add("ok");done(ok)});
+ else{const chk=()=>{const v=parseFloat(String($("#mngin").value).replace(/\s/g,"").replace(",",".").replace("−","-"));if(isNaN(v)){$("#mngin").focus();return}done(Math.abs(v-tk.a)<=tk.tol)};$("#mngok").onclick=chk;$("#mngin").onkeydown=ev=>{if(ev.key==="Enter")chk()}}}
+function mngCard(){return `<div class="card" id="mngcard"><p class="label">Manometry a log p-h</p><p class="hint">Odečti ze servisních manometrů teploty sytosti, spočítej přehřátí a podchlazení a najdi oběh v diagramu log p-h.</p>
+ <div class="chips">${[["vse","Vše"],...Object.entries(MNG_K).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<button class="chip" data-mngk="${k}" aria-pressed="${mngKind===k}">${n}</button>`).join("")}</div><div id="mngbody"></div></div>`}
+function mngBind(){document.querySelectorAll("[data-mngk]").forEach(ch=>ch.onclick=()=>{mngKind=ch.dataset.mngk;document.querySelectorAll("[data-mngk]").forEach(x=>x.setAttribute("aria-pressed",x===ch));mngNew()});if(mngCur&&(mngKind==="vse"||mngCur.kind===mngKind))mngDraw(null);else mngNew()}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${prsCard()}${vacCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${mngCard()}${prsCard()}${vacCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
-  schBind();simBind();prsBind();vacBind();ordBind();
+  schBind();simBind();mngBind();prsBind();vacBind();ordBind();
 }
 // ── kartičky ──
 function cards(){
