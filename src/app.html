@@ -106,6 +106,14 @@ dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:7
 .search{font:500 16px var(--f-ui);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);width:100%}
 .sub2{position:static;grid-template-columns:1fr 1fr!important}
 .sub3{position:static;grid-template-columns:1fr 1fr 1fr!important}
+.sch{width:100%;max-width:460px;display:block;margin:8px auto 0;touch-action:manipulation}
+.sch .sp{cursor:pointer}.sch .sp rect:not(.hit),.sch .sp circle,.sch .sp:not(.sl)>path:not(.coil):not(.cap){fill:var(--surface2);stroke:var(--fg);stroke-width:1.6}
+.sch .sl path{fill:none}.sch rect.hit{fill:transparent;stroke:none}
+.sch .coil,.sch .cap{fill:none;stroke:var(--muted);stroke-width:1.4}.sch .dot{fill:var(--ok)!important;stroke:none!important}
+.sch text{font:600 11px var(--f-ui);fill:var(--muted);text-anchor:middle;pointer-events:none}.sch text.in{fill:var(--fg);font-size:10px}.sch .lbl text{font-size:10px;font-weight:500}.sch.quiz .lbl,.sch.quiz>.sp>text:not(.in){display:none}
+.sch .sp.sel rect:not(.hit),.sch .sp.sel circle,.sch .sp.sel>path:not(.coil){stroke:var(--accent)!important;stroke-width:3}
+.sch .sp.good rect:not(.hit),.sch .sp.good circle,.sch .sp.good>path{stroke:var(--ok)!important;stroke-width:3.5}
+.sch .sp.wrong rect:not(.hit),.sch .sp.wrong circle,.sch .sp.wrong>path{stroke:var(--bad)!important;stroke-width:3.5}
 .weak{border-left:3px solid var(--bad);padding-left:8px}
 .prog .line.tap{cursor:pointer}
 .confirm{color:var(--bad)}
@@ -385,14 +393,74 @@ function ordDraw(res){const o=ORD[ordI],b=$("#ordbody");if(!b)return;
  if(!res)b.querySelectorAll("[data-un]").forEach(x=>x.onclick=()=>{ordPick.splice(+x.dataset.un,1);ordDraw()});
  if(res){$("#ordagain").onclick=()=>ordNew(ordI);$("#ordnext").onclick=()=>{ordNew((ordI+1)%ORD.length);document.querySelectorAll("[data-ord]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.ord===ordI))}}}
 function ordBind(){document.querySelectorAll("[data-ord]").forEach(c=>c.onclick=()=>{document.querySelectorAll("[data-ord]").forEach(x=>x.setAttribute("aria-pressed",x===c));ordNew(+c.dataset.ord)});ordNew(ordI)}
+// ── klikací schéma okruhu ──
+const SCH={
+ komp:["Kompresor",6,"Nasaje přehřátou páru o nízkém tlaku a stlačí ji na vysoký tlak a teplotu.","Vstup: přehřátá pára NT · výstup: horká přehřátá pára VT (výtlak často 60–90 °C)","Hlídat přehřátí na sání (kapalina ničí ventily), teplotu výtlaku, olej a proud motoru."],
+ vt:["Vysokotlaký presostat",9,"Vypne kompresor, když kondenzační tlak překročí nastavenou mez.","Snímá tlak na výtlaku","Vypíná při zaneseném kondenzátoru, stojícím ventilátoru, přeplnění nebo nekondenzujících plynech. Bezpečnostní má ruční reset."],
+ kond:["Kondenzátor",7,"Odvede teplo z chladiva do vzduchu nebo vody. Chladivo se ochladí, zkapalní a podchladí.","Vstup: přehřátá pára VT · výstup: podchlazená kapalina","Tři části: odpřehřátí, kondenzace při stálé teplotě, podchlazení. Podchlazení = kondenzační teplota − teplota kapaliny."],
+ sber:["Sběrač kapaliny",9,"Zásobník kapalného chladiva. Vyrovnává potřebu náplně při různém zatížení a pojme náplň při pump-downu.","Vstup i výstup: kapalina VT","Kapalina odchází ze dna sběrače, takže do kapalinového potrubí neproudí pára."],
+ filtr:["Filtr-dehydrátor",9,"Zachytí vlhkost, kyseliny a nečistoty.","Kapalina VT","Citelně chladnější výstup = ucpaný filtr. Při každém otevření okruhu se mění, po vyhoření kompresoru protikyselinový."],
+ pruh:["Průhledítko s indikátorem vlhkosti",9,"Ukáže, zda do expanzního ventilu teče čistá kapalina a zda je okruh suchý.","Kapalina VT","Bubliny: málo chladiva, malé podchlazení nebo ucpaný filtr. Barva indikátoru: zelená = suché, žlutá = vlhkost."],
+ tev:["Termostatický expanzní ventil (TEV)",9,"Škrtí kapalinu z vysokého na nízký tlak a dávkuje ji do výparníku podle přehřátí na jeho výstupu.","Vstup: kapalina VT · výstup: směs kapaliny a páry NT","Přehřátí se nastavuje stavěcím šroubem. Při větší tlakové ztrátě výparníku má TEV vnější vyrovnání tlaku."],
+ tyk:["Tykavka TEV",9,"Snímá teplotu sání za výparníkem a podle ní otevírá nebo zavírá TEV.","Plněná náplní, kapilárou spojená s TEV","Na vodorovném sání těsně za výparníkem, dobře připevněná a zaizolovaná. Na tenčím potrubí nahoře, na silnějším ze strany."],
+ vypar:["Výparník",8,"Chladivo se v něm vypařuje při nízkém tlaku a odebírá teplo z prostoru nebo z vody.","Vstup: směs kapaliny a páry NT · výstup: přehřátá pára NT","Vypařování probíhá při stálé teplotě. Přehřátí = teplota sání − vypařovací teplota, obvykle 5–8 K."],
+ nt:["Nízkotlaký presostat",9,"Vypne kompresor při příliš nízkém sacím tlaku.","Snímá tlak na sání","Vypíná při úniku chladiva, namrzlém výparníku, stojícím ventilátoru výparníku. Používá se i k pump-downu."],
+ odl:["Odlučovač kapaliny",9,"Zachytí kapalné chladivo v sání, aby se nedostalo do kompresoru.","Přehřátá pára NT (zachycená kapalina se postupně odpaří)","Typicky u tepelných čerpadel a zařízení s odtáváním, kde může kapalina přijít nárazově."],
+ lv:["Výtlačné potrubí",1,"Vede horkou páru z kompresoru do kondenzátoru.","Vysoký tlak · přehřátá pára","Nejteplejší místo okruhu – pozor na popálení."],
+ lk:["Kapalinové potrubí",1,"Vede podchlazenou kapalinu z kondenzátoru k expanznímu ventilu.","Vysoký tlak · kapalina","Teplé až vlažné. Tlaková ztráta nebo ohřev může kapalinu odpařit dřív, než dojde k TEV."],
+ lm:["Potrubí za expanzním ventilem",1,"Vede studenou směs kapaliny a páry do výparníku.","Nízký tlak · směs kapaliny a páry","Teplota odpovídá vypařovací teplotě."],
+ ls:["Sací potrubí",1,"Vede páru z výparníku zpět do kompresoru.","Nízký tlak · přehřátá pára","Studené, má být izolované. Orosené až namrzlé u kompresoru ukazuje na malé přehřátí."]
+};
+const SCH_PARTS=["komp","vt","kond","sber","filtr","pruh","tev","tyk","vypar","nt","odl"];
+let schSel=null,schQ=null,schScore=[0,0];
+function schSvg(){const L=(id,d,c,dash)=>`<g class="sp sl" data-sp="${id}"><path d="${d}" fill="none" stroke="transparent" stroke-width="16"/><path d="${d}" fill="none" stroke="var(${c})" stroke-width="3.5"${dash?' stroke-dasharray="6 4"':''}/></g>`;
+ const zig=(x0,x1,y,h)=>{let d=`M${x0} ${y}`;for(let x=x0+10,k=0;x<=x1;x+=10,k++)d+=` L${x} ${y+(k%2?-h:h)}`;return d};
+ return `<svg viewBox="0 0 360 320" class="sch${schQ?" quiz":""}" role="img" aria-label="Schéma chladicího okruhu">
+ ${L("lv","M300 139 V40 H250","--high")}
+ ${L("lk","M110 40 H50 V70 M50 110 V135 M50 160 V172 M50 188 V203","--high")}
+ ${L("lm","M50 227 V275 H110","--low",1)}
+ ${L("ls","M250 275 H300 V250 M300 212 V191","--low")}
+ <g class="sp" data-sp="kond"><rect x="110" y="20" width="140" height="40" rx="6"/><path d="${zig(120,240,40,10)}" fill="none" class="coil"/><text x="180" y="14">kondenzátor</text></g>
+ <g class="sp" data-sp="komp"><circle cx="300" cy="165" r="26"/><path d="M286 172 L314 158 M286 158 L314 172" class="coil"/></g>
+ <g class="sp" data-sp="vt"><rect class="hit" x="304" y="82" width="44" height="36"/><path d="M300 100 H312"/><rect x="312" y="90" width="28" height="20" rx="4"/><text x="326" y="104" class="in">VT</text></g>
+ <g class="sp" data-sp="sber"><rect class="hit" x="28" y="66" width="44" height="48"/><rect x="38" y="70" width="24" height="40" rx="10"/></g>
+ <g class="sp" data-sp="filtr"><rect class="hit" x="28" y="131" width="44" height="33"/><rect x="42" y="135" width="16" height="25" rx="3"/><path d="M45 140 L55 155 M55 140 L45 155" class="coil"/></g>
+ <g class="sp" data-sp="pruh"><rect class="hit" x="28" y="166" width="44" height="28"/><circle cx="50" cy="180" r="8"/><circle cx="50" cy="180" r="3.5" class="dot"/></g>
+ <g class="sp" data-sp="tev"><rect class="hit" x="28" y="198" width="48" height="36"/><path d="M38 203 L62 227 L38 227 L62 203 Z"/><path d="M62 215 H72" /></g>
+ <g class="sp" data-sp="tyk"><rect class="hit" x="250" y="258" width="30" height="24"/><path d="M72 215 H264 V266" fill="none" stroke-dasharray="2 3" class="cap"/><rect x="258" y="266" width="14" height="9" rx="3"/></g>
+ <g class="sp" data-sp="vypar"><rect x="110" y="255" width="140" height="40" rx="6"/><path d="${zig(120,240,275,10)}" fill="none" class="coil"/><text x="180" y="311">výparník</text></g>
+ <g class="sp" data-sp="nt"><rect class="hit" x="263" y="284" width="44" height="34"/><path d="M285 275 V290"/><rect x="271" y="290" width="28" height="20" rx="4"/><text x="285" y="304" class="in">NT</text></g>
+ <g class="sp" data-sp="odl"><rect class="hit" x="282" y="206" width="36" height="50"/><rect x="290" y="212" width="20" height="38" rx="8"/></g>
+ <g class="lbl"><text x="262" y="169" style="text-anchor:end">kompresor</text><text x="70" y="94" style="text-anchor:start">sběrač</text><text x="66" y="151" style="text-anchor:start">filtr-dehydrátor</text><text x="66" y="184" style="text-anchor:start">průhledítko</text><text x="66" y="240" style="text-anchor:start">TEV</text><text x="250" y="250" style="text-anchor:end">tykavka</text><text x="284" y="228" style="text-anchor:end">odlučovač</text></g>
+ </svg>`}
+function schCard(){return `<div class="card" id="schcard"><p class="label">Schéma chladicího okruhu</p>
+ <div class="seg sub2"><button data-sm="u" aria-pressed="${!schQ}">Prozkoumat</button><button data-sm="q" aria-pressed="${!!schQ}">Najdi díl</button></div>
+ <div id="schsvg">${schSvg()}</div>
+ <p class="note"><span style="color:var(--high)">━</span> vysoký tlak · <span style="color:var(--low)">━</span> nízký tlak · čárkovaně směs za TEV</p>
+ <div id="schinfo"></div></div>`}
+function schInfo(){const el=$("#schinfo");if(!el)return;
+ document.querySelectorAll(".sch .sp").forEach(g=>g.classList.toggle("sel",g.dataset.sp===schSel));const sv=$(".sch");if(sv)sv.classList.toggle("quiz",!!schQ);
+ if(schQ){el.innerHTML=`<p class="q" style="font-size:18px">Najdi: ${esc(SCH[schQ.id][0])}</p><p class="hint">Skóre ${schScore[0]}/${schScore[1]}${schQ.msg?" · "+schQ.msg:""}</p>`;return}
+ if(!schSel){el.innerHTML=`<p class="hint">Klepni na díl nebo potrubí. Tok chladiva: kompresor → kondenzátor → sběrač → filtr → průhledítko → TEV → výparník → odlučovač → kompresor.</p>`;return}
+ const p=SCH[schSel];el.innerHTML=`<div class="expl"><strong>${esc(p[0])}</strong> <span class="tag">okruh ${p[1]}</span><br>${esc(p[2])}<br><b>${esc(p[3])}</b><br><span class="hint">${esc(p[4])}</span></div>`}
+function schNewQ(msg,avoid){const ids=SCH_PARTS.filter(x=>(!schQ||x!==schQ.id)&&x!==avoid);schQ={id:ids[Math.floor(Math.random()*ids.length)],msg};schSel=null;schInfo()}
+function schBind(){
+ document.querySelectorAll("[data-sm]").forEach(b=>b.onclick=()=>{document.querySelectorAll("[data-sm]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+   if(b.dataset.sm==="q"){schScore=[0,0];schNewQ()}else{schQ=null;schSel=null;schInfo()}});
+ document.querySelectorAll(".sch .sp").forEach(g=>g.onclick=()=>{const id=g.dataset.sp;
+   if(!schQ){schSel=id;schInfo();return}
+   const ok=id===schQ.id;schScore[1]++;if(ok)schScore[0]++;
+   g.classList.add(ok?"good":"wrong");setTimeout(()=>g.classList.remove("good","wrong"),700);
+   schNewQ(ok?"správně":"ne, to byl "+SCH[id][0].toLowerCase(),id)});
+ schInfo()}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
-  ordBind();
+  schBind();ordBind();
 }
 // ── kartičky ──
 function cards(){
