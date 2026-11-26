@@ -26,4 +26,5 @@ Osobní PWA pro přípravu na přeškolení F-plynů: kat. I/II → A1/A2 a nov�
 
 ## Stav
 - Verze 7: přesun z artefaktu claude.ai na GitHub Pages + Supabase sync.
-- Výuková prezentace (48 slajdů) je samostatný artefakt v Claude.
+- Verze 8: modul Hořlavá chladiva +30 otázek (podklad SCHKT, EN 378), lekce, tahák „Hořlavá chladiva (EN 378)“, slovníček. Nové otázky jsou na konci banky – id stávajících se nemění (id = modul + pořadí).
+- Výukové prezentace jsou samostatné artefakty v Claude: hlavní (48 slajdů) a navazující Hořlavá chladiva.
