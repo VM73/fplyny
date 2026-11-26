@@ -1,0 +1,597 @@
+<title>F-plyny Přeškolení</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: jedna úzká karta jako servisní manometr – nahoře barvy hadic (modrá sání / červená výtlak), pod tím segmentová navigace */
+:root{
+  --bg:#eef2f5; --surface:#ffffff; --surface2:#f5f7f9; --line:#d9e0e6;
+  --fg:#14202b; --muted:#5d6b78;
+  --low:#1f6fd1; --high:#d0342c; --ok:#1f8a4c; --okbg:#e3f4ea; --bad:#c2352b; --badbg:#fbe7e5;
+  --accent:#1f6fd1; --accentbg:#e4eefb;
+  --f-ui:"Archivo",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-num:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --r:14px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1319; --surface:#17212b; --surface2:#1d2a36; --line:#2a3846;
+  --fg:#e7eef4; --muted:#93a3b2;
+  --low:#5aa2ff; --high:#ff6b62; --ok:#4cc985; --okbg:#173326; --bad:#ff7a70; --badbg:#3a1d1b;
+  --accent:#5aa2ff; --accentbg:#1a2c44; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1319; --surface:#17212b; --surface2:#1d2a36; --line:#2a3846;
+  --fg:#e7eef4; --muted:#93a3b2;
+  --low:#5aa2ff; --high:#ff6b62; --ok:#4cc985; --okbg:#173326; --bad:#ff7a70; --badbg:#3a1d1b;
+  --accent:#5aa2ff; --accentbg:#1a2c44; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-ui);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 40px}
+.wrap{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-direction:column;gap:6px}
+.hoses{display:flex;height:5px;border-radius:3px;overflow:hidden}
+.hoses i{flex:1}.hoses i:first-child{background:var(--low)}.hoses i:nth-child(2){background:#f1c40f}.hoses i:last-child{background:var(--high)}
+h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0;text-wrap:balance}
+.sub{color:var(--muted);font-size:14px;margin:0}
+.sync{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin:0}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync.on i{background:var(--ok)}.sync.err i{background:var(--bad)}
+.seg{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.seg button{border:0;background:transparent;color:var(--fg);font:600 13px var(--f-ui);padding:8px 2px;border-radius:8px;cursor:pointer;min-width:0}
+.seg button[aria-pressed="true"]{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--surface2);color:var(--fg);border-radius:999px;padding:6px 11px;font:500 13px var(--f-ui);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.chip small{font-family:var(--f-num);font-size:10px;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--accentbg);border-color:var(--accent);color:var(--accent)}
+.chip[aria-pressed="true"] small{color:var(--accent)}
+.btn{border:0;border-radius:12px;padding:13px 16px;font:700 16px var(--f-ui);cursor:pointer;background:var(--accent);color:#fff}
+.btn.ghost{background:var(--surface2);color:var(--fg);border:1px solid var(--line)}
+.btn.bad{background:var(--bad)}.btn.ok{background:var(--ok)}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>.btn{flex:1}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.tag{font:700 11px var(--f-num);padding:3px 7px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.q{font-size:19px;font-weight:700;line-height:1.35;margin:0;text-wrap:pretty}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:12px 14px;font:500 15px var(--f-ui);cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+.opt b{font-family:var(--f-num);color:var(--muted);flex:0 0 auto}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default}
+.expl{border-left:4px solid var(--ok);background:var(--surface2);border-radius:0 10px 10px 0;padding:10px 12px;font-size:15px}
+.expl.wrong{border-left-color:var(--bad)}
+.expl .src{display:block;margin-top:6px;font:500 12px var(--f-num);color:var(--muted)}
+.bar{height:8px;border-radius:4px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent)}
+.prog{display:flex;flex-direction:column;gap:12px}
+.prog .line{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.prog .line span{font-size:14px}.prog .line em{font:600 13px var(--f-num);font-style:normal;color:var(--muted)}
+.prog .line .bar{grid-column:1/-1}
+.big{font:700 44px var(--f-num);margin:0;letter-spacing:-.02em}
+.flash{min-height:230px;justify-content:center;cursor:pointer;text-align:left}
+.flash .back{border-top:1px dashed var(--line);padding-top:12px}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.calc label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.calc input,.calc select{font:600 17px var(--f-num);padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);width:100%}
+.result{display:flex;flex-direction:column;gap:4px}
+.result .v{font:700 32px var(--f-num)}
+ul.wrong{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.note{font-size:12px;color:var(--muted)}
+[hidden]{display:none!important}
+.confrow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.confrow div{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.confrow b{font:700 22px var(--f-num)}.confrow span{font-size:12px;color:var(--muted);line-height:1.2}
+#view{display:flex;flex-direction:column;gap:14px}
+/* prezentace */
+.slide{position:relative;width:100%;aspect-ratio:16/9;background:var(--surface2);border-radius:10px;overflow:hidden;border:1px solid var(--line);cursor:zoom-in;touch-action:pan-y pinch-zoom}
+.slide img{width:100%;height:100%;object-fit:contain;display:block}
+.pnav{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center}
+.pnav .btn{padding:11px 18px}
+.pnum{text-align:center;font-weight:700;font-size:15px;color:var(--muted)}
+.notes{font-size:15px;line-height:1.55;margin:0;white-space:pre-wrap}
+select.psec{width:100%;font:500 15px inherit;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+#pfull{position:fixed;inset:0;background:#000;z-index:60;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#pfull .rot{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;flex:none}
+#pfull img{max-width:100%;object-fit:contain;display:block}
+#pfull .bar{flex:none;height:48px;display:flex;gap:14px;align-items:center;justify-content:center;background:none;color:#fff;font:700 17px -apple-system,system-ui,sans-serif}
+#pfull .bar span{color:#fff;background:none;min-width:70px;text-align:center}
+#pfull .rot img{flex:0 1 auto;min-height:0}
+#pfull button{flex:none;-webkit-appearance:none;appearance:none;background:#2c3a4b;color:#fff;border:1px solid #5d6b78;border-radius:12px;min-width:48px;height:44px;padding:0 16px;font:700 20px -apple-system,system-ui,sans-serif;cursor:pointer}
+#pfull .pclose{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:calc(env(safe-area-inset-right,0px) + 10px);background:#d23b33;border-color:#d23b33;z-index:61;font-size:15px}
+ul.lesson{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:10px;font-size:16px;line-height:1.5}
+dl.kv{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:8px 14px;margin:0;font-size:14px}
+dl.kv dt{color:var(--muted)}dl.kv dd{margin:0;font-weight:600;font-variant-numeric:tabular-nums}
+dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:700;margin-top:8px}dl.gl dd{margin:0;color:var(--muted);font-size:15px}
+.search{font:500 16px var(--f-ui);padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--fg);width:100%}
+.sub2{position:static;grid-template-columns:1fr 1fr!important}
+.confirm{color:var(--bad)}
+@media (max-width:440px){.seg{grid-template-columns:repeat(4,1fr)}.seg button{padding-left:2px;padding-right:2px;font-size:13px}}
+@media (max-width:380px){.seg button{font-size:12px}.q{font-size:17px}}
+@media (prefers-reduced-motion:no-preference){.opt,.chip,.btn{transition:background .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="hoses" aria-hidden="true"><i></i><i></i><i></i></div>
+    <h1>F-plyny Přeškolení</h1>
+    <p class="sub">Příprava na přeškolení kat. I/II → A1/A2 a nové kategorie B (CO₂) a C (NH₃) · nařízení (EU) 2024/573</p>
+    <p class="sync" id="sync"><i></i><span>Pokrok: jen v tomto zařízení</span></p>
+  </header>
+  <nav class="seg" id="nav">
+    <button data-v="learn" aria-pressed="true">Učení</button>
+    <button data-v="test" aria-pressed="false">Zkouška</button>
+    <button data-v="cards" aria-pressed="false">Kartičky</button>
+    <button data-v="prax" aria-pressed="false">Praxe</button>
+    <button data-v="cheat" aria-pressed="false">Tahák</button>
+    <button data-v="calc" aria-pressed="false">Výpočty</button>
+    <button data-v="prez" aria-pressed="false">Prezentace</button>
+
+  </nav>
+  <main id="view"></main>
+  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá k tvému účtu claude.ai a zároveň v prohlížeči.</p>
+</div>
+
+<script>
+/*QUESTIONS*/
+/*CONTENT*/
+/*PREZ*/
+const SAT=/*SAT*/;
+</script>
+<script>
+// <calc>
+function co2e(kg,gwp){return kg*gwp/1000}
+function leakInterval(t,lds,hfoKg){ // vrací měsíce nebo null
+  if(hfoKg!=null){ if(hfoKg<1) return null; if(hfoKg<10) return lds?24:12; if(hfoKg<100) return lds?12:6; return lds?6:3 }
+  if(t<5) return null; if(t<50) return lds?24:12; if(t<500) return lds?12:6; return lds?6:3;
+}
+// </calc>
+const $=s=>document.querySelector(s), view=$("#view");
+Q.forEach((q,i)=>q.id=q.m+"-"+i);
+const KEY="fplyny-v1";const A_MODS=["leg","env","fyz","kom","tes","pot","hor","bez","ene","sit"];
+let S={box:{},seen:{},tm:{},mods:Object.keys(MODULES),tests:[]};
+try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r))}catch(e){}
+if(!(S.modNew||[]).includes("sit")){S.modNew=(S.modNew||[]).concat("sit");if(!S.mods.includes("sit"))S.mods.push("sit")}
+let cloud=null,cloudTimer=null,cloudBusy=false,cloudDirty=false;
+function setSync(t,c){const el=$("#sync");if(!el)return;el.className="sync "+(c||"");el.querySelector("span").textContent=t}
+function save(){S.upd=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(cloud){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,1500)}}
+async function pushCloud(){if(!cloud)return;if(cloudBusy){cloudDirty=true;return}cloudBusy=true;
+  try{await cloud.set({box:S.box,seen:S.seen,tm:S.tm||{},tests:S.tests,prax:S.prax||{},mods:S.mods,upd:S.upd||Date.now()});setSync("Pokrok: uložen k účtu","on")}
+  catch(e){setSync("Pokrok: uložení k účtu selhalo, je v tomto zařízení","err")}
+  cloudBusy=false;if(cloudDirty){cloudDirty=false;pushCloud()}}
+function mergeRemote(r){if(!r)return false;let ch=false;
+  for(const id in (r.seen||{})){if((r.seen[id]||0)>(S.seen[id]||0)){S.seen[id]=r.seen[id];S.box[id]=(r.box||{})[id]||0;ch=true}}
+  S.tm=S.tm||{};const last=a=>a&&a.length?a[a.length-1].d:0;
+  for(const id in (r.tm||{})){if(last(r.tm[id])>last(S.tm[id])){S.tm[id]=r.tm[id];ch=true}}
+  const keys=new Set(S.tests.map(t=>t.d));(r.tests||[]).forEach(t=>{if(!keys.has(t.d)){S.tests.push(t);ch=true}});
+  S.tests.sort((a,b)=>a.d-b.d);S.tests=S.tests.slice(-30);
+  if((r.upd||0)>(S.upd||0)){S.prax=r.prax||{};if(Array.isArray(r.mods)&&r.mods.length)S.mods=r.mods.filter(m=>MODULES[m]);ch=true}
+  return ch}
+async function initCloud(){
+  try{if(!window.claude||!claude.use)return;
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);if(!db||!user)return;
+    const id=await user.id();if(!id)return;
+    const ref=db.collection("data/users/"+id).doc("progress");
+    setSync("Pokrok: načítám z účtu…");
+    const snap=await Promise.race([ref.get(),new Promise((_,rej)=>setTimeout(()=>rej(new Error("timeout")),10000))]);
+    cloud=ref;
+    const changed=snap.exists?mergeRemote(snap.data()):false;
+    try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+    setSync("Pokrok: uložen k účtu","on");
+    if(!snap.exists||changed)pushCloud();
+    if(changed){const cur=document.querySelector('#nav button[aria-pressed="true"]');if(cur&&!document.querySelector("#next,.opt:disabled,#clock"))go(cur.dataset.v)}
+    document.addEventListener("visibilitychange",async()=>{if(document.visibilityState!=="visible"||!cloud)return;
+      try{const s2=await cloud.get();if(s2.exists&&mergeRemote(s2.data())){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}}catch(e){}});
+  }catch(e){setSync("Pokrok: účet nedostupný, ukládá se v tomto zařízení","err")}
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// <conf>
+const READ_CPS=18; // odhad rychlosti čtení: znaků za sekundu
+function readMs(text){return text.length/READ_CPS*1000}
+function slowLimit(tm){const all=[];for(const id in tm)tm[id].forEach(r=>{if(r.ok)all.push(r.a)});
+  if(all.length<10)return 6000;all.sort((a,b)=>a-b);return Math.max(4000,all[Math.floor(all.length/2)]*1.6)}
+function classify(ok,adj,lim){const fast=adj<=lim;return ok?(fast?"jiste":"vahave"):(fast?"omyl":"nevi")}
+// </conf>
+const CLS={jiste:["Jistě","var(--ok)"],vahave:["Váhavě","#d29a12"],omyl:["Chybně s jistotou","var(--bad)"],nevi:["Nevěděl","var(--muted)"]};
+function stopwatch(){let t0=performance.now(),acc=0,run=!document.hidden;
+  const vis=()=>{if(document.hidden&&run){acc+=performance.now()-t0;run=false}else if(!document.hidden&&!run){t0=performance.now();run=true}};
+  document.addEventListener("visibilitychange",vis);
+  return ()=>{document.removeEventListener("visibilitychange",vis);return Math.min(120000,acc+(run?performance.now()-t0:0))}}
+function mark(q,ok,ms,rm){S.tm=S.tm||{};let c=null;
+  if(ms!=null){const adj=Math.max(0,ms-(rm||0));c=classify(ok,adj,slowLimit(S.tm));
+    (S.tm[q.id]=S.tm[q.id]||[]).push({ms:Math.round(ms),a:Math.round(adj),ok,c,d:Date.now()});S.tm[q.id]=S.tm[q.id].slice(-5)}
+  const b=S.box[q.id]||0;S.box[q.id]=!ok?1:c==="vahave"?Math.max(b,1):Math.min(b+1,5);
+  S.seen[q.id]=Date.now();save();return c}
+function lastCls(q){const a=(S.tm||{})[q.id];return a&&a.length?a[a.length-1].c:null}
+function sec(ms){return (ms/1000).toLocaleString("cs-CZ",{maximumFractionDigits:1})+" s"}
+function median(a){if(!a.length)return 0;a=a.slice().sort((x,y)=>x-y);return a[Math.floor(a.length/2)]}
+function pool(){return Q.filter(q=>S.mods.includes(q.m))}
+function pickLearn(n){ // nejnižší krabička a nejdéle neviděné první
+  return pool().slice().sort((a,b)=>((S.box[a.id]||0)-(S.box[b.id]||0))||((S.seen[a.id]||0)-(S.seen[b.id]||0))||Math.random()-.5).slice(0,n);
+}
+function modChips(){
+  return `<div class="card"><p class="label">Okruhy</p><div class="chips">${Object.entries(MODULES).map(([k,v])=>
+  `<button class="chip" data-mod="${k}" aria-pressed="${S.mods.includes(k)}">${v.name}<small>${v.cat}</small></button>`).join("")}</div>
+  <div class="row"><button class="btn ghost" id="selA">Jen A1/A2</button><button class="btn ghost" id="selBC">Jen B + C</button><button class="btn ghost" id="selAll">Vše</button></div></div>`;
+}
+function bindChips(rerender){
+  view.querySelectorAll("[data-mod]").forEach(b=>b.onclick=()=>{const k=b.dataset.mod;
+    S.mods=S.mods.includes(k)?S.mods.filter(x=>x!==k):[...S.mods,k]; if(!S.mods.length)S.mods=[k]; save(); rerender()});
+  $("#selA").onclick=()=>{S.mods=A_MODS;save();rerender()};
+  $("#selBC").onclick=()=>{S.mods=["co2","nh3"];save();rerender()};
+  $("#selAll").onclick=()=>{S.mods=Object.keys(MODULES);save();rerender()};
+}
+// ── otázka ──
+function renderQuestion(q,idx,total,onDone,showFeedback=true){
+  const opts=shuffle(q.a.map((t,i)=>({t,ok:i===0})));
+  view.innerHTML=`<div class="card">
+    <div class="meta"><span class="tag">${MODULES[q.m].cat}</span><span>${MODULES[q.m].name}</span><span style="font-family:var(--f-num)">${idx+1}/${total}</span></div>
+    <div class="bar"><i style="width:${(idx/total)*100}%"></i></div>
+    <p class="q">${esc(q.q)}</p>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt" data-i="${i}"><b>${"ABCD"[i]}</b><span>${esc(o.t)}</span></button>`).join("")}</div>
+    <div id="fb"></div></div>`;
+  const sw=stopwatch(),rm=readMs(q.q+q.a.join(""));
+  view.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    const o=opts[+b.dataset.i],ms=sw();
+    if(!showFeedback){onDone(o.ok,ms,rm);return}
+    view.querySelectorAll(".opt").forEach((x,i)=>{x.disabled=true;if(opts[i].ok)x.classList.add("ok")});
+    if(!o.ok)b.classList.add("bad");
+    $("#fb").innerHTML=`<div class="expl ${o.ok?"":"wrong"}"><strong>${o.ok?"Správně.":"Špatně."}</strong> ${esc(q.e)}${q.s?`<span class="src">${esc(q.s)}</span>`:""}</div>
+      <button class="btn" id="next" style="width:100%;margin-top:12px">${idx+1<total?"Další otázka":"Vyhodnotit"}</button>`;
+    $("#next").onclick=()=>onDone(o.ok,ms,rm); $("#next").focus();
+  });
+}
+// ── učení ──
+function lesson(m){
+  const p=Q.filter(q=>q.m===m),kn=p.filter(q=>(S.box[q.id]||0)>=3).length;
+  view.innerHTML=`<div class="card"><div class="meta"><span class="tag">${MODULES[m].cat}</span><span>${kn}/${p.length} zvládnuto</span></div>
+  <h2 class="q" style="font-size:22px">${MODULES[m].name}</h2>
+  <ul class="lesson">${(LESSONS[m]||[]).map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+  <div class="row"><button class="btn" id="lgo">Procvičit tento okruh</button>${PREZ_MAP[m]?`<button class="btn ghost" id="lprez">Slajdy k okruhu</button>`:""}<button class="btn ghost" id="lback">Zpět</button></div></div>`;
+  if(PREZ_MAP[m])$("#lprez").onclick=()=>{const [d,sid]=PREZ_MAP[m],dk=PREZ.find(x=>x.id===d);prezShow(d,Math.max(0,dk.s.findIndex(x=>x.id===sid)))};
+  $("#lgo").onclick=()=>runLearn(Q.filter(q=>q.m===m).sort((a,b)=>((S.box[a.id]||0)-(S.box[b.id]||0))||Math.random()-.5).slice(0,10));
+  $("#lback").onclick=learnHome; window.scrollTo(0,0);
+}
+function learnHome(){
+  const p=pool(),known=p.filter(q=>(S.box[q.id]||0)>=3).length;
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${modChips()}
+  <div class="card"><p class="label">Procvičování</p><p class="hint">10 otázek. Nejdřív přijdou ty, které neznáš nebo jsi je dlouho neviděl. Chybné se vrací častěji.</p>
+  <div class="meta"><span>Zvládnuto ${known} z ${p.length}</span><button class="chip" id="toStats">Celkový pokrok</button></div><div class="bar"><i style="width:${p.length?known/p.length*100:0}%"></i></div>
+  <button class="btn" id="go">Začít procvičování</button></div>
+  <div class="card"><p class="label">Lekce</p><p class="hint">Krátký výklad k okruhu, pak rovnou otázky jen z něj.</p>
+  <div class="chips">${Object.entries(MODULES).map(([k,v])=>`<button class="chip" data-les="${k}">${v.name}</button>`).join("")}</div></div></div>`;
+  view.querySelectorAll("[data-les]").forEach(b=>b.onclick=()=>lesson(b.dataset.les));
+  bindChips(learnHome); $("#go").onclick=()=>runLearn(pickLearn(10));$("#toStats").onclick=()=>{document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",false));stats()};
+}
+function runLearn(list){let i=0,ok=0;
+  const step=()=>{ if(i>=list.length){view.innerHTML=`<div class="card"><p class="label">Hotovo</p><p class="big">${ok}/${list.length}</p><p class="hint">Chybné otázky se ti objeví znovu v příštím kole.</p><div class="row"><button class="btn" id="again">Další kolo</button><button class="btn ghost" id="home">Zpět</button></div></div>`;
+    $("#again").onclick=()=>runLearn(pickLearn(10));$("#home").onclick=learnHome;return}
+    renderQuestion(list[i],i,list.length,(r,ms,rm)=>{mark(list[i],r,ms,rm);if(r)ok++;i++;step()})};
+  step();
+}
+// ── zkouška ──
+const EXAMS={
+  A1:{n:"Zkouška A1 (CHKT a TČ)",d:{L:23,co2:1,nh3:1,fyz:10,kom:10,tes:10,pot:10,hor:12,bez:5,ene:3},need:68,min:60},
+  A2:{n:"Zkouška A2 (CHKT a TČ)",d:{L:23,co2:1,nh3:1,fyz:7,kom:5,tes:10,pot:5,hor:10,bez:5,ene:3},need:56,min:60},
+  KS:{n:"Zkouška A1/A2 (K a S)",d:{L:13,co2:1,nh3:1,fyz:6,kom:6,tes:6,pot:6,hor:7,bez:3,ene:1},need:40,min:40},
+  BC:{n:"Test B + C",d:{co2:10,nh3:10},need:16,min:20}
+};
+function buildExam(k){let out=[];
+  for(const [m,c] of Object.entries(EXAMS[k].d)){const p=Q.filter(q=>m==="L"?(q.m==="leg"||q.m==="env"):q.m===m);out=out.concat(shuffle(p).slice(0,c))}
+  return out}
+let timer=null;
+function testHome(){
+  clearInterval(timer);
+  const p=pool(),n=Math.min(30,p.length);
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+  <div class="card"><p class="label">Zkouška nanečisto</p>
+  <p class="hint">Podle zkušebních řádů dvou hodnotitelských subjektů. Vždy legislativa podle přílohy I nař. 2024/2215 a odborná část podle kategorie. Hranice 80 %, vyhodnocení až na konci.</p>
+  <p class="label">Formát CHKT a TČ · 60 minut</p>
+  <div class="row"><button class="btn" data-ex="A1">A1 · 85 otázek</button><button class="btn" data-ex="A2">A2 · 70 otázek</button></div>
+  <p class="label">Formát K a S · 40 minut</p>
+  <button class="btn" data-ex="KS">A1 / A2 · 50 otázek, 40 správně</button>
+  <button class="btn ghost" data-ex="BC">Test B + C · 20 otázek</button>
+  <p class="note">Počty otázek a témata se mohou u jednotlivých hodnotitelských subjektů lišit. Test B + C je můj cvičný, ve vzorovém řádu není.</p>
+  ${S.tests.length?`<p class="hint">Poslední výsledky: ${S.tests.slice(-6).map(t=>`<span style="font-family:var(--f-num)">${t.k||"test"} ${t.p} %</span>`).join(" · ")}</p>`:""}</div>
+  ${modChips()}
+  <div class="card"><p class="label">Rychlý test z vybraných okruhů</p><p class="hint">${n} náhodných otázek, bez časového limitu.</p><button class="btn ghost" id="go">Spustit rychlý test</button></div></div>`;
+  bindChips(testHome); $("#go").onclick=()=>runTest(shuffle(p).slice(0,n),null);
+  view.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>runTest(buildExam(b.dataset.ex),b.dataset.ex));
+}
+function runTest(list,k){let i=0;const res=[],cls=[],times=[];clearInterval(timer);
+  const end=k?Date.now()+EXAMS[k].min*60*1000:0;
+  const tick=()=>{const el=$("#clock");if(!end||!el)return;const r=Math.max(0,end-Date.now());
+    el.textContent=String(Math.floor(r/60000)).padStart(2,"0")+":"+String(Math.floor(r/1000)%60).padStart(2,"0");
+    if(r<=0){clearInterval(timer);while(res.length<list.length)res.push(false);testResult(list,res,k,true,cls,times)}};
+  const step=()=>{ if(i>=list.length){clearInterval(timer);return testResult(list,res,k,false,cls,times)}
+    renderQuestion(list[i],i,list.length,(r,ms,rm)=>{res.push(r);cls.push(mark(list[i],r,ms,rm));times.push(ms);i++;step()},false);
+    if(end){view.querySelector(".meta").insertAdjacentHTML("beforeend",`<span class="tag" id="clock"></span>`);tick()}};
+  if(end)timer=setInterval(tick,1000);
+  step();
+}
+function testResult(list,res,k,timeout,cls=[],times=[]){
+  const ok=res.filter(Boolean).length,p=Math.round(ok/list.length*100);
+  const need=k?EXAMS[k].need:Math.ceil(list.length*.8),pass=ok>=need;
+  S.tests.push({p,k:k||"",d:Date.now()});S.tests=S.tests.slice(-30);save();
+  const wrong=list.filter((q,i)=>!res[i]);
+  const byMod={};list.forEach((q,i)=>{const m=q.m==="env"?"leg":q.m;byMod[m]=byMod[m]||[0,0];byMod[m][1]++;if(res[i])byMod[m][0]++});
+  view.innerHTML=`<div class="card"><p class="label">${k?EXAMS[k].n:"Rychlý test"}${timeout?" · čas vypršel":""}</p><p class="big" style="color:${pass?"var(--ok)":"var(--bad)"}">${p} %</p>
+  <p class="hint">${ok} z ${list.length} správně · potřeba ${need} · ${pass?"vyhověl":"nevyhověl"}</p>
+  <div class="prog">${Object.entries(byMod).map(([m,[a,b]])=>`<div class="line"><span>${MODULES[m].name}</span><em>${a}/${b}</em><div class="bar"><i style="width:${a/b*100}%;background:${a/b>=.8?"var(--ok)":"var(--bad)"}"></i></div></div>`).join("")}</div>
+  ${times.length?`<p class="label">Jistota odpovědí</p><div class="confrow">${Object.entries(CLS).map(([c,[n,col]])=>`<div><b style="color:${col}">${cls.filter(x=>x===c).length}</b><span>${n}</span></div>`).join("")}</div>
+  <p class="hint">Medián času na otázku ${sec(median(times))}. Odhad jistoty bere v úvahu délku otázky a tvoje obvyklé tempo.</p>`:""}
+  ${cls.includes("omyl")?`<p class="label" style="color:var(--bad)">Chybně s jistotou – tady máš látku naučenou špatně</p><ul class="wrong">${list.filter((q,i)=>cls[i]==="omyl").map(q=>`<li><strong>${esc(q.q)}</strong><br>Správně: ${esc(q.a[0])}<br><span class="hint">${esc(q.e)}</span></li>`).join("")}</ul>`:""}
+  ${cls.includes("vahave")?`<p class="label">Správně, ale váhavě</p><ul class="wrong">${list.filter((q,i)=>cls[i]==="vahave").map(q=>`<li>${esc(q.q)}<br><span class="hint">${esc(q.a[0])}</span></li>`).join("")}</ul>`:""}
+  ${wrong.length?`<p class="label">Všechny chybné odpovědi</p><ul class="wrong">${wrong.map(q=>`<li><strong>${esc(q.q)}</strong><br>Správně: ${esc(q.a[0])}<br><span class="hint">${esc(q.e)}</span></li>`).join("")}</ul>`:""}
+  <div class="row"><button class="btn" id="again">Zpět na zkoušky</button>${wrong.length?`<button class="btn ghost" id="fix">Procvičit chyby</button>`:""}</div>
+  ${cls.includes("omyl")?`<button class="btn bad" id="fixc">Procvičit chyby s jistotou</button>`:""}</div>`;
+  $("#again").onclick=testHome; if(wrong.length)$("#fix").onclick=()=>runLearn(wrong);
+  if(cls.includes("omyl"))$("#fixc").onclick=()=>runLearn(list.filter((q,i)=>cls[i]==="omyl"));
+}
+// ── praxe ──
+const PRAX=[
+ {t:"A1 · Výměna komponentu – otevření okruhu a odpájení",s:[
+  ["Popiš chladicí okruh","Kompresor, kondenzátor, expanzní prvek, výparník; vysokotlaká a nízkotlaká strana, kde je kapalina a kde pára."],
+  ["Urči chladivo, množství a rizika","Ze štítku: typ, náplň v kg, t CO₂e. Rizika: tlak, omrzliny, u HC/A2L hořlavost, rozklad v plameni."],
+  ["Vizuální kontrola a protokol rizik","Stav zařízení, olejové skvrny (únik), elektrika, větrání, zdroje zapálení."],
+  ["Zabezpeč pracoviště, postup, nářadí, OOPP","Vypnout a zajistit napájení, brýle, rukavice, u HC detektor, hasicí přístroj, označení prostoru."],
+  ["Znovuzískej chladivo do sběrné nádoby","Vhodná vyvakuovaná láhev pro dané chladivo, vážení, max. dovolená náplň, nemíchat chladiva."],
+  ["Vyvakuuj okruh a připrav k rozpájení","U HC profouknout dusíkem, okruh bez tlaku a bez hořlavého plynu."],
+  ["Bezpečně odpájej díl","Odpájet (ne řezat pod tlakem), zaslepit konce, chránit okolí."]]},
+ {t:"A1 · Výměna komponentu – napájení a uvedení do provozu",s:[
+  ["Popiš okruh, chladivo a rizika","Stejně jako výše."],
+  ["Napájej filtrdehydrátor","Směr toku podle šipky, profuk dusíkem při pájení, filtr chránit před přehřátím (mokrý hadr)."],
+  ["Tlaková zkouška dusíkem","Tlak podle zařízení a štítku, sledovat pokles, kontrola spojů pěnotvorným roztokem."],
+  ["Vakuování","Hluboké vakuum, uzavřít a sledovat nárůst: ustálení = vlhkost, trvalý růst = netěsnost."],
+  ["Naplň předepsanou dávku","Vážením; směsi v kapalné fázi; HC opatrně a bez zdrojů zapálení."],
+  ["Kontrola těsnosti a zápis","Detektorem po naplnění, servisní ventily a čepičky; zápis do záznamů zařízení."]]},
+ {t:"A1 + A2 · Uvedení do provozu",s:[
+  ["Popiš okruh, chladivo a rizika",""],["Vizuální kontrola a protokol rizik",""],["Zabezpeč pracoviště a OOPP",""],
+  ["Kontrola těsnosti přetlakem a vakuem","Dusík, výdrž tlaku, pak vakuum a test nárůstu."],
+  ["Naplň a zkontroluj těsnost","Plnit vážením; po naplnění detektor."],
+  ["Zápis do záznamů zařízení","Datum, chladivo, množství, kontrola těsnosti, certifikovaná osoba a firma."]]},
+ {t:"A1 + A2 · Znovuzískání chladiva před servisem",s:[
+  ["Popiš okruh, chladivo a rizika",""],["Vizuální kontrola a protokol rizik",""],["Zabezpeč pracoviště a OOPP",""],
+  ["Znovuzískej chladivo do sběrné nádoby","Nejdřív kapalina, pak pára; láhev na váze, nepřeplnit, označit."],
+  ["Zabezpeč okruh pro další servis","Okruh bez přetlaku, uzavřené ventily, u HC bez hořlavého plynu."],
+  ["Zápis do záznamů zařízení","Druh a množství znovuzískaného chladiva."]]}
+];
+// ── seřazování pracovních postupů ──
+const ORD=[
+ {t:"Montáž splitu",tip:"Lem a momentový klíč zabrání úniku; bez tlakové zkoušky a vakua se neotvírají ventily.",s:["Umístit a ukotvit jednotky, ověřit spád odvodu kondenzátu","Uříznout trubky řezákem a odjehlit otvorem dolů","Nasadit matice, zalemovat a zkontrolovat lem","Dotáhnout spoje momentovým klíčem","Tlaková zkouška dusíkem a kontrola spojů","Vakuování a test nárůstu tlaku","Otevřít servisní ventily, případně doplnit náplň vážením","Kontrola těsnosti detektorem, čepičky ventilů, zápis"]},
+ {t:"Tlaková zkouška dusíkem",tip:"Nikdy přes PS ze štítku a nikdy bez redukčního ventilu – láhev dusíku má až 200 bar a víc.",s:["Zjistit nejvyšší dovolený tlak PS ze štítku","Připojit láhev přes redukční ventil a manometr","Napouštět postupně až na zkušební tlak","Uzavřít a odpojit láhev, zapsat tlak a teplotu okolí","Zkontrolovat spoje pěnotvorným roztokem a sledovat tlak","Vyhodnotit pokles s přepočtem na teplotu","Dusík bezpečně vypustit do venkovního prostoru"]},
+ {t:"Vakuování a test nárůstu tlaku",tip:"Test nárůstu: ustálení = vlhkost (vakuovat dál), trvalý růst = netěsnost (hledat únik).",s:["Připojit vývěvu krátkými hadicemi a vakuometr k okruhu","Otevřít obě strany okruhu (VT i NT)","Vakuovat pod cca 500 mikronů (0,67 mbar)","Uzavřít ventil k vývěvě a vývěvu vypnout","Sledovat nárůst tlaku 10–15 minut","Vyhodnotit: ustálení = vlhkost, trvalý růst = netěsnost","Vakuum zlomit chladivem a plnit"]},
+ {t:"Znovuzískání do recyklační láhve",tip:"Láhev max. na 80 % objemu kapalinou – na váze, nikdy odhadem. Chladiva nemíchat.",s:["Zkontrolovat láhev: určená pro chladivo, vyvakuovaná, platná zkouška, štítek","Postavit láhev na váhu, zjistit táru a max. náplň","Propojit okruh, odsávačku a láhev, odvzdušnit hadice","Odsát nejdřív kapalinu, potom páru","Hlídat váhu, nepřekročit max. náplň (80 %)","Při dosažení předepsaného podtlaku uzavřít ventily","Zvážit, označit láhev a zapsat množství do záznamů"]},
+ {t:"Lemový spoj",tip:"Matice se nasazuje PŘED lemováním – po zalemování už nejde nasadit.",s:["Uříznout trubku kolmo řezákem","Odjehlit otvorem dolů, aby piliny nepadaly do trubky","Nasadit převlečnou matici","Upnout trubku do lemovacího přípravku na správnou výšku","Zalemovat a zkontrolovat lem (hladký, bez trhlin)","Dotáhnout momentovým klíčem podle výrobce"]},
+ {t:"Tvrdé pájení pod dusíkem",tip:"Dusík během pájení brání okujím uvnitř trubky; při pájení nikdy nesmí být v okruhu chladivo.",s:["Očistit a zasunout trubky se správnou vůlí","Pustit malý průtok suchého dusíku přes redukční ventil","Chránit citlivé díly (ventily, filtr) mokrým hadrem nebo pastou","Rovnoměrně nahřát spoj a přidat pájku","Nechat vychladnout pod dusíkem","Tlaková zkouška spoje"]},
+ {t:"Otevření okruhu s R290",tip:"Hořlavé chladivo: bez zdrojů zapálení do 3 m, detektor, větrání, odsávačka pro hořlavá chladiva, dusík bez kyslíku.",s:["Vypnout a zajistit napájení, odstranit zdroje zapálení do 3 m","Zajistit větrání, detektor hořlavých plynů a hasicí přístroj","Odsát chladivo odsávačkou pro hořlavá chladiva do vyvakuované láhve","Odsávat až do vakua","Napustit cca 0,1 bar suchého dusíku, hadici vyvést ven","Odpájet a vyměnit díl","Zapájet, tlaková zkouška, vakuum a plnění vážením"]}
+];
+let ordI=0,ordPick=[],ordMix=[];
+function ordCard(){return `<div class="card" id="ordcard"><p class="label">Seřaď kroky postupu</p><p class="hint">Klepej na kroky ve správném pořadí. Klepnutím na krok v tvém pořadí ho vrátíš.</p>
+ <div class="chips">${ORD.map((o,i)=>`<button class="chip" data-ord="${i}" aria-pressed="${i===ordI}">${o.t}</button>`).join("")}</div><div id="ordbody"></div></div>`}
+function ordNew(i){ordI=i;ordPick=[];const o=ORD[i];ordMix=o.s.map((_,k)=>k);do{ordMix.sort(()=>Math.random()-.5)}while(ordMix.every((v,k)=>v===k));ordDraw()}
+function ordDraw(res){const o=ORD[ordI],b=$("#ordbody");if(!b)return;
+ b.innerHTML=`<p class="label" style="margin-top:10px">Tvoje pořadí (${ordPick.length}/${o.s.length})</p><div class="opts">${ordPick.map((k,n)=>`<button class="opt${res?(k===n?" ok":" bad"):""}" data-un="${n}"><b>${n+1}</b><span>${esc(o.s[k])}</span></button>`).join("")||`<p class="hint">Zatím nic.</p>`}</div>
+ ${res?"":`<p class="label" style="margin-top:10px">Kroky</p><div class="opts">${ordMix.filter(k=>!ordPick.includes(k)).map(k=>`<button class="opt" data-pk="${k}"><span>${esc(o.s[k])}</span></button>`).join("")}</div>`}
+ ${res?`<div class="expl" style="margin-top:10px;border-left-color:${res.ok?"var(--ok)":"var(--bad)"}"><b>${res.ok?"Správně, celé pořadí sedí.":`Správně ${res.n} z ${o.s.length} pozic.`}</b>${res.ok?"":`<ol style="margin:8px 0 0;padding-left:20px">${o.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`}<p style="margin:8px 0 0"><b>Bezpečnost:</b> ${esc(o.tip)}</p></div>
+ <div class="row" style="margin-top:10px"><button class="btn" id="ordagain">Znovu</button><button class="btn ghost" id="ordnext">Další postup</button></div>`:""}`;
+ b.querySelectorAll("[data-pk]").forEach(x=>x.onclick=()=>{ordPick.push(+x.dataset.pk);if(ordPick.length===o.s.length){const n=ordPick.filter((k,i)=>k===i).length;ordDraw({ok:n===o.s.length,n})}else ordDraw()});
+ if(!res)b.querySelectorAll("[data-un]").forEach(x=>x.onclick=()=>{ordPick.splice(+x.dataset.un,1);ordDraw()});
+ if(res){$("#ordagain").onclick=()=>ordNew(ordI);$("#ordnext").onclick=()=>{ordNew((ordI+1)%ORD.length);document.querySelectorAll("[data-ord]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.ord===ordI))}}}
+function ordBind(){document.querySelectorAll("[data-ord]").forEach(c=>c.onclick=()=>{document.querySelectorAll("[data-ord]").forEach(x=>x.setAttribute("aria-pressed",x===c));ordNew(+c.dataset.ord)});ordNew(ordI)}
+function prax(){
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
+   return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
+  <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
+  view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
+  $("#pr").onclick=()=>{S.prax={};save();prax()};
+  ordBind();
+}
+// ── kartičky ──
+function cards(){
+  const list=pickLearn(pool().length);let i=0;
+  const draw=()=>{const q=list[i%list.length];
+    view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+    <div class="card flash" id="fc" role="button" tabindex="0" aria-label="Otočit kartičku">
+      <div class="meta"><span class="tag">${MODULES[q.m].cat}</span><span>${MODULES[q.m].name}</span></div>
+      <p class="q">${esc(q.q)}</p><p class="hint" id="tap">Klepni pro odpověď</p><div class="back" id="back" hidden><p style="margin:0 0 6px;font-weight:700;color:var(--ok)">${esc(q.a[0])}</p><p style="margin:0;font-size:15px">${esc(q.e)}</p></div></div>
+    <div class="row" id="judge" hidden><button class="btn bad" id="no">Neznal jsem</button><button class="btn ok" id="yes">Znal jsem</button></div>
+    <p class="hint">Kartičky berou okruhy vybrané v Učení. Krabička otázky: <span style="font-family:var(--f-num)">${S.box[q.id]||0}/5</span></p></div>`;
+    const sw=stopwatch();let fms=null;
+    const flip=()=>{if(fms==null)fms=sw();$("#back").hidden=false;$("#tap").hidden=true;$("#judge").hidden=false};
+    $("#fc").onclick=flip;$("#fc").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();flip()}};
+    $("#no").onclick=()=>{mark(q,false,fms,readMs(q.q));i++;draw()};$("#yes").onclick=()=>{mark(q,true,fms,readMs(q.q));i++;draw()};
+  };draw();
+}
+// ── kalkulačka ──
+const GAS=[["R32",675],["R410A",2088],["R407C",1774],["R134a",1430],["R404A",3922],["R507A",3985],["R448A",1387],["R449A",1397],["R454B",466],["R513A",631],["R1234yf (HFO)",-1],["R1234ze (HFO)",-1],["Vlastní GWP",0]];
+// <calc2>
+function satT(arrT,arrP,p){ // lineární interpolace přetlak -> teplota
+  if(p<arrP[0]||p>arrP[arrP.length-1])return null;
+  for(let i=1;i<arrP.length;i++){if(p<=arrP[i]){const f=(p-arrP[i-1])/(arrP[i]-arrP[i-1]);return arrT[i-1]+f*(arrT[i]-arrT[i-1])}}return null}
+// </calc2>
+// ── cvičení s výpočty (generovaná čísla, řešení s postupem) ──
+const rnd=(a,b)=>a+Math.random()*(b-a), ri=(a,b)=>Math.floor(rnd(a,b+1)), pick=a=>a[ri(0,a.length-1)];
+const cz=(x,d=2)=>Number(x).toLocaleString("cs-CZ",{maximumFractionDigits:d,minimumFractionDigits:0});
+const nearI=(arr,v)=>arr.reduce((bi,x,i)=>Math.abs(x-v)<Math.abs(arr[bi]-v)?i:bi,0);
+const EXG={
+ co2e:["CO₂ ekvivalent",()=>{const g=pick(GAS.filter(x=>x[1]>0)),kg=+(pick([rnd(0.5,3),rnd(2,15),rnd(10,80)])).toFixed(pick([1,2]));const a=co2e(kg,g[1]);
+  return{t:`Zařízení obsahuje <b>${cz(kg)} kg ${g[0]}</b> (GWP ${g[1]}). Kolik je to t CO₂e?`,a,u:"t CO₂e",tol:Math.max(0.01,a*0.005),st:`t CO₂e = kg × GWP / 1000 = ${cz(kg)} × ${g[1]} / 1000 = <b>${cz(a,2)} t</b>`}}],
+ interval:["Interval kontrol",()=>{const g=pick(GAS.filter(x=>x[1]>0)),kg=+(pick([rnd(0.8,4),rnd(3,30),rnd(20,300)])).toFixed(1),lds=Math.random()<.35,t=co2e(kg,g[1]),m=leakInterval(t,lds);
+  return{t:`<b>${cz(kg,1)} kg ${g[0]}</b> (GWP ${g[1]}), ${lds?"<b>se</b> systémem detekce úniku":"bez systému detekce úniku"}. Jak často je nutná kontrola těsnosti?`,
+  opts:["nepovinná","24 měsíců","12 měsíců","6 měsíců","3 měsíce"],ok:m?`${m} měsíc${m===3?"e":"ů"}`:"nepovinná",
+  st:`${cz(kg,1)} × ${g[1]} / 1000 = <b>${cz(t,2)} t CO₂e</b>. Pásma: pod 5 t nepovinné · 5–50 t 12 měs. · 50–500 t 6 měs. · nad 500 t 3 měs.${lds?" Se systémem detekce se interval zdvojnásobí.":""}${t>=500?" Nad 500 t je detekce úniku povinná.":""}`}}],
+ prehrati:["Přehřátí",()=>{const k=pick(["R410A","R32","R134a","R407C","R454B","R290"]),r=SAT[k],t0i=ri(-8,10),i=nearI(r.t,t0i),p=+r.d[i].toFixed(1),t0=satT(r.t,r.d,p),ts=+(t0+rnd(2,14)).toFixed(1),a=ts-t0;
+  return{t:`${k}: sací tlak <b>${cz(p,1)} bar</b> (přetlak), teplota sacího potrubí <b>${cz(ts,1)} °C</b>. Jaké je přehřátí?`,a,u:"K",tol:0.6,
+  st:`Z tabulky sytosti: ${cz(p,1)} bar přetlak → rosný bod t₀ = <b>${cz(t0,1)} °C</b>. Přehřátí = t sání − t₀ = ${cz(ts,1)} − (${cz(t0,1)}) = <b>${cz(a,1)} K</b>. Teplotu sytosti najdeš v kartě Přehřátí a podchlazení níže.`}}],
+ podchlazeni:["Podchlazení",()=>{const k=pick(["R410A","R32","R134a","R407C","R454B","R290"]),r=SAT[k],tki=ri(35,50),i=nearI(r.t,tki),p=+r.b[i].toFixed(1),tk=satT(r.t,r.b,p),tl=+(tk-rnd(2,10)).toFixed(1),a=tk-tl;
+  return{t:`${k}: kondenzační tlak <b>${cz(p,1)} bar</b> (přetlak), teplota kapalinového potrubí <b>${cz(tl,1)} °C</b>. Jaké je podchlazení?`,a,u:"K",tol:0.6,
+  st:`Z tabulky sytosti: ${cz(p,1)} bar přetlak → bod varu t_k = <b>${cz(tk,1)} °C</b>. Podchlazení = t_k − t kapaliny = ${cz(tk,1)} − ${cz(tl,1)} = <b>${cz(a,1)} K</b>.`}}],
+ cop:["EER / COP",()=>{const heat=Math.random()<.5,q=+rnd(2.5,16).toFixed(1),pe=+(q/rnd(2.6,4.8)).toFixed(2),a=q/pe;
+  return{t:`${heat?"Tepelné čerpadlo dává topný":"Klimatizace dává chladicí"} výkon <b>${cz(q,1)} kW</b> při elektrickém příkonu <b>${cz(pe,2)} kW</b>. Jaký je ${heat?"COP":"EER"}?`,a,u:"",tol:0.05,
+  st:`${heat?"COP = topný":"EER = chladicí"} výkon / příkon = ${cz(q,1)} / ${cz(pe,2)} = <b>${cz(a,2)}</b>`}}],
+ tlak:["Tlaková zkouška",()=>{const p1=ri(20,42),t1=ri(15,30),t2=t1-ri(3,12),pa1=p1+1.013,pa2=pa1*(t2+273.15)/(t1+273.15),a=pa2-1.013;
+  return{t:`Okruh natlakovaný dusíkem na <b>${p1} bar</b> přetlak při <b>${t1} °C</b>. Ráno je <b>${t2} °C</b>. Jaký přetlak má manometr ukázat, je-li okruh těsný?`,a,u:"bar",tol:0.12,
+  st:`Gay-Lussac v absolutních hodnotách: p₂ = p₁ × T₂ / T₁ = (${p1} + 1,013) × (${t2} + 273,15) / (${t1} + 273,15) = ${cz(pa2,2)} bar abs → <b>${cz(a,2)} bar</b> přetlak. Pokles o ${cz(p1-a,2)} bar je jen vliv teploty.`}}],
+ lahev:["Recyklační láhev",()=>{const v=pick([12.5,26.8,61]),[k,rho]=pick([["R410A",1.06],["R32",0.96],["R134a",1.21],["R407C",1.14]]),max=0.8*v*rho,obs=+(rnd(0.1,0.6)*max).toFixed(1),a=max-obs;
+  return{t:`Recyklační láhev <b>${cz(v,1)} l</b>, hustota kapalného ${k} uvaž <b>${cz(rho,2)} kg/l</b>, plnit max. 80 % objemu. V láhvi už je <b>${cz(obs,1)} kg</b>. Kolik kg smíš ještě odsát?`,a,u:"kg",tol:0.15,
+  st:`Max. náplň = 0,8 × ${cz(v,1)} l × ${cz(rho,2)} kg/l = ${cz(max,2)} kg. Zbývá ${cz(max,2)} − ${cz(obs,1)} = <b>${cz(a,2)} kg</b>. V praxi platí údaj na štítku láhve a láhev se plní na váze.`}}],
+ doplneni:["Doplnění náplně",()=>{const pre=pick([5,7,7.5,10]),L=+(pre+rnd(2,18)).toFixed(0),g=pick([15,20,25,30,40]),a=(L-pre)*g;
+  return{t:`Split je z výroby naplněn na <b>${pre} m</b> potrubí, skutečná délka je <b>${L} m</b>. Výrobce udává <b>${g} g/m</b> navíc. Kolik chladiva doplníš?`,a,u:"g",tol:1,
+  st:`(${L} − ${pre}) m × ${g} g/m = <b>${cz(a,0)} g</b>. Plnit vážením, směsi v kapalné fázi.`}}],
+ prevod:["Převody tlaku",()=>{const p=+rnd(0.5,40).toFixed(1),m=pick(["kPa abs","bar abs","MPa abs","kPa"]),f={"kPa abs":[(p+1.013)*100,"(p + 1,013) × 100",1],"bar abs":[p+1.013,"p + 1,013",0.02],"MPa abs":[(p+1.013)/10,"(p + 1,013) / 10",0.002],"kPa":[p*100,"p × 100",1]}[m];
+  return{t:`Manometr ukazuje <b>${cz(p,1)} bar</b> přetlaku. Kolik je to v <b>${m}</b>?`,a:f[0],u:m,tol:f[2],st:`${f[1]} = <b>${cz(f[0],3)} ${m}</b>. 1 bar = 100 kPa = 0,1 MPa; absolutní tlak = přetlak + atmosférický (≈ 1,013 bar).`}}]
+};
+let exKind="vse",exCur=null,exScore=[0,0];
+function exCard(){return `<div class="card" id="excard"><p class="label">Cvičení s výpočty</p><p class="hint">Čísla se pokaždé mění, po kontrole uvidíš postup. Desetinnou čárku piš normálně.</p>
+  <div class="chips">${[["vse","Vše"],...Object.entries(EXG).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<button class="chip" data-exk="${k}" aria-pressed="${exKind===k}">${n}</button>`).join("")}</div><div id="exbody"></div></div>`}
+function exNew(){const k=exKind==="vse"?pick(Object.keys(EXG)):exKind;exCur={k,...EXG[k][1]()};exDraw()}
+function exDraw(){const e=exCur,b=$("#exbody");if(!b)return;
+  b.innerHTML=`<p class="tag" style="align-self:flex-start;margin-top:8px">${EXG[e.k][0]} · správně ${exScore[0]}/${exScore[1]}</p><p style="font-size:17px;line-height:1.45;margin:8px 0">${e.t}</p>
+  ${e.opts?`<div class="opts">${e.opts.map(o=>`<button class="opt" data-exo="${o}">${o}</button>`).join("")}</div>`:
+  `<div class="calc" style="grid-template-columns:1fr auto;align-items:end"><label for="exin">Výsledek${e.u?" ["+e.u+"]":""}<input id="exin" type="text" inputmode="decimal" autocomplete="off"></label><button class="btn" id="exok">Zkontrolovat</button></div>`}
+  <div id="exres"></div>`;
+  const done=ok=>{exScore[1]++;if(ok)exScore[0]++;$("#exres").innerHTML=`<div class="expl" style="border-left-color:${ok?"var(--ok)":"var(--bad)"}"><b>${ok?"Správně.":"Chyba."}</b> ${e.opts?"":`Výsledek: <b>${cz(e.a,e.u==="g"?0:2)} ${e.u}</b>. `}${e.st}</div><button class="btn" id="exnext" style="margin-top:10px;width:100%">Další příklad</button>`;$("#exnext").onclick=exNew;
+    b.querySelectorAll("button.opt,#exok,#exin").forEach(x=>x.disabled=true)};
+  if(e.opts)b.querySelectorAll("[data-exo]").forEach(x=>x.onclick=()=>{const ok=x.dataset.exo===e.ok;x.classList.add(ok?"ok":"bad");if(!ok)b.querySelector(`[data-exo="${e.ok}"]`).classList.add("ok");done(ok)});
+  else{const chk=()=>{const v=parseFloat(String($("#exin").value).replace(/\s/g,"").replace(",","."));if(isNaN(v)){$("#exin").focus();return}done(Math.abs(v-e.a)<=e.tol)};$("#exok").onclick=chk;$("#exin").onkeydown=ev=>{if(ev.key==="Enter")chk()}}
+}
+function exBind(){document.querySelectorAll("[data-exk]").forEach(c=>c.onclick=()=>{exKind=c.dataset.exk;document.querySelectorAll("[data-exk]").forEach(x=>x.setAttribute("aria-pressed",x===c));exNew()});exNew()}
+function calc(){
+  view.innerHTML=exCard()+`<div class="card"><p class="label">Přehřátí a podchlazení</p>
+  <div class="calc">
+    <label for="ref">Chladivo<select id="ref">${Object.keys(SAT).map(k=>`<option>${k}</option>`).join("")}</select></label>
+    <span></span>
+    <label for="ps">Sací tlak [bar přetlak]<input id="ps" type="number" inputmode="decimal" step="0.1" value="8.5"></label>
+    <label for="ts">Teplota sání [°C]<input id="ts" type="number" inputmode="decimal" step="0.1" value="8"></label>
+    <label for="pk">Kondenzační tlak [bar přetlak]<input id="pk" type="number" inputmode="decimal" step="0.1" value="26"></label>
+    <label for="tk">Teplota kapaliny [°C]<input id="tk" type="number" inputmode="decimal" step="0.1" value="40"></label>
+  </div>
+  <div class="calc"><div class="result" id="rsh"></div><div class="result" id="rsc"></div></div>
+  <p class="hint">Sytá teplota z tabulek CoolProp. Přehřátí se počítá od rosného bodu, podchlazení od bodu varu – u zeotropních směsí (R407C, R448A, R449A) je mezi nimi teplotní skluz. Tlak zadávej jako přetlak z manometru.</p></div>
+  <div class="card"><p class="label">CO₂ ekvivalent a interval kontrol</p>
+  <div class="calc">
+    <label for="gas">Chladivo<select id="gas">${GAS.map((g,i)=>`<option value="${i}">${g[0]}${g[1]>0?" · "+g[1]:""}</option>`).join("")}</select></label>
+    <label for="kg">Náplň [kg]<input id="kg" type="number" inputmode="decimal" step="0.01" value="3"></label>
+    <label for="gwp" id="gwpl" hidden>GWP<input id="gwp" type="number" inputmode="numeric" value="675"></label>
+    <label for="lds">Detekce úniku<select id="lds"><option value="0">Ne</option><option value="1">Ano</option></select></label>
+  </div>
+  <div class="result" id="res"></div>
+  <p class="hint">t CO₂e = kg × GWP / 1000. Intervaly podle čl. 5 nař. 2024/573 (hermeticky uzavřená zařízení do 10 t CO₂e / 2 kg HFO jsou vyňata). GWP podle přílohy I nařízení.</p></div>`;
+  const upd=()=>{const g=GAS[+$("#gas").value];$("#gwpl").hidden=g[1]!==0;
+    const kg=parseFloat(String($("#kg").value).replace(",","."))||0,lds=$("#lds").value==="1";
+    let out;
+    if(g[1]===-1){const m=leakInterval(0,lds,kg);out=`<span class="v">${kg.toLocaleString("cs-CZ")} kg HFO</span><span>${m?`Kontrola těsnosti alespoň každých <strong>${m} měsíců</strong>`:"Pod 1 kg – pravidelné kontroly nejsou povinné"}</span>`}
+    else{const gwp=g[1]||(+$("#gwp").value||0),t=co2e(kg,gwp),m=leakInterval(t,lds);
+      out=`<span class="v">${t.toLocaleString("cs-CZ",{maximumFractionDigits:2})} t CO₂e</span><span>${m?`Kontrola těsnosti alespoň každých <strong>${m} měsíců</strong>`:"Pod 5 t CO₂e – pravidelné kontroly nejsou povinné"}</span>${t>=500?`<span class="confirm">Povinný systém detekce úniku (≥ 500 t CO₂e)</span>`:""}<span class="hint">Hranice 5 t odpovídá ${gwp?(5000/gwp).toLocaleString("cs-CZ",{maximumFractionDigits:2}):"–"} kg tohoto chladiva.</span>`}
+    $("#res").innerHTML=out};
+  ["gas","kg","gwp","lds"].forEach(id=>$("#"+id).addEventListener("input",upd));upd();
+  const num=id=>parseFloat(String($("#"+id).value).replace(",","."));
+  const upd2=()=>{const r=SAT[$("#ref").value];
+    const t0=satT(r.t,r.d,num("ps")),tk=satT(r.t,r.b,num("pk"));
+    const f=x=>x.toLocaleString("cs-CZ",{maximumFractionDigits:1,minimumFractionDigits:1});
+    $("#rsh").innerHTML=t0==null?`<span class="hint">Sací tlak mimo tabulku (${r.t[0]} až ${r.t[r.t.length-1]} °C)</span>`:`<span class="label">Přehřátí</span><span class="v">${f(num("ts")-t0)} K</span><span class="hint">t₀ rosný bod ${f(t0)} °C</span>`;
+    $("#rsc").innerHTML=tk==null?`<span class="hint">Kondenzační tlak mimo tabulku${$("#ref").value.startsWith("R744")?" – CO₂ nad 31 °C nekondenzuje (transkritický provoz)":""}</span>`:`<span class="label">Podchlazení</span><span class="v">${f(tk-num("tk"))} K</span><span class="hint">t_k bod varu ${f(tk)} °C</span>`};
+  ["ref","ps","ts","pk","tk"].forEach(id=>$("#"+id).addEventListener("input",upd2));upd2();
+  exBind();
+}
+// ── pokrok ──
+let resetArm=false;
+function confCard(){
+  const ans=Q.filter(q=>lastCls(q));if(!ans.length)return `<div class="card"><p class="label">Jistota odpovědí</p><p class="hint">Zatím žádná měření. Čas se měří od zobrazení otázky do odpovědi.</p></div>`;
+  const cnt=c=>ans.filter(q=>lastCls(q)===c).length,om=cnt("omyl");
+  return `<div class="card"><p class="label">Jistota odpovědí</p><p class="hint">Podle poslední odpovědi na každou otázku (${ans.length} změřených). Hranice pomalé odpovědi je teď ${sec(slowLimit(S.tm))} po odečtení času na přečtení.</p>
+  <div class="confrow">${Object.entries(CLS).map(([c,[n,col]])=>`<div><b style="color:${col}">${cnt(c)}</b><span>${n}</span></div>`).join("")}</div>
+  <div class="prog">${Object.entries(MODULES).map(([k,v])=>{const p=ans.filter(q=>q.m===k);if(!p.length)return "";const j=p.filter(q=>lastCls(q)==="jiste").length;
+   const med=median(p.map(q=>S.tm[q.id][S.tm[q.id].length-1].ms));
+   return `<div class="line"><span>${v.name}</span><em>${Math.round(j/p.length*100)} % jistě · ${sec(med)}</em><div class="bar"><i style="width:${j/p.length*100}%;background:var(--ok)"></i></div></div>`}).join("")}</div>
+  ${om?`<button class="btn bad" id="omyl">Procvičit chyby s jistotou (${om})</button>`:`<p class="hint">Žádné chyby s jistotou.</p>`}</div>`}
+function stats(){
+  const tot=Q.length,known=Q.filter(q=>(S.box[q.id]||0)>=3).length;
+  view.innerHTML=`<div class="card"><p class="label">Celkem zvládnuto</p><p class="big">${Math.round(known/tot*100)} %</p><p class="hint">${known} z ${tot} otázek (zvládnutá = 3× po sobě správně)</p>
+  <div class="prog">${Object.entries(MODULES).map(([k,v])=>{const p=Q.filter(q=>q.m===k),kn=p.filter(q=>(S.box[q.id]||0)>=3).length;
+  return `<div class="line"><span>${v.name} <span class="tag">${v.cat}</span></span><em>${kn}/${p.length}</em><div class="bar"><i style="width:${kn/p.length*100}%"></i></div></div>`}).join("")}</div>
+  <button class="btn ghost" id="reset">${resetArm?"Klepni znovu pro smazání pokroku":"Smazat pokrok"}</button></div>
+  ${confCard()}`;
+  $("#reset").onclick=()=>{if(resetArm){S.box={};S.seen={};S.tm={};S.tests=[];save();resetArm=false}else resetArm=true;stats()};
+  const om=Q.filter(q=>lastCls(q)==="omyl");if($("#omyl"))$("#omyl").onclick=()=>runLearn(om);
+}
+let cheatTab="t";
+function cheat(){
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">
+  <div class="seg sub2"><button data-c="t" aria-pressed="${cheatTab==="t"}">Tahák</button><button data-c="g" aria-pressed="${cheatTab==="g"}">Slovníček</button></div>
+  <div id="cbody" style="display:flex;flex-direction:column;gap:14px"></div></div>`;
+  view.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{cheatTab=b.dataset.c;cheat()});
+  const body=$("#cbody");
+  if(cheatTab==="t"){body.innerHTML=CHEAT.map(c=>`<div class="card"><p class="label">${esc(c.h)}</p><dl class="kv">${c.rows.map(r=>`<dt>${esc(r[0])}</dt><dd>${esc(r[1])}</dd>`).join("")}</dl></div>`).join("")}
+  else{body.innerHTML=`<div class="card"><label for="gq" class="label">Hledat pojem</label><input id="gq" class="search" type="search" placeholder="např. přehřátí"><dl class="gl" id="gl"></dl></div>`;
+    const draw=()=>{const f=$("#gq").value.trim().toLowerCase();$("#gl").innerHTML=GLOSS.filter(g=>!f||(g[0]+g[1]).toLowerCase().includes(f)).map(g=>`<dt>${esc(g[0])}</dt><dd>${esc(g[1])}</dd>`).join("")||`<dd>Nic nenalezeno.</dd>`};
+    $("#gq").addEventListener("input",draw);draw()}
+}
+// ── prezentace ──
+const PREZ_KEY="fplyny-prez";
+const PREZ_MAP={leg:["hlavni","predpisy"],env:["hlavni","druhy"],fyz:["hlavni","obeh"],kom:["hlavni","diagnostika"],tes:["hlavni","postup"],hor:["horlava","cover"],pot:["hlavni","potrubi"],bez:["hlavni","bezpecnost"],co2:["hlavni","co2"],nh3:["hlavni","nh3"]};
+function prezPos(){try{return JSON.parse(localStorage.getItem(PREZ_KEY))||{}}catch(e){return{}}}
+function prezSave(d,i){const p=prezPos();p[d]=i;try{localStorage.setItem(PREZ_KEY,JSON.stringify(p))}catch(e){}}
+const prezImg=(d,i)=>`prez/${d}/${String(i+1).padStart(2,"0")}.webp`;
+function prez(){
+  const pos=prezPos();
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${PREZ.map(d=>{const at=pos[d.id]||0;return`<div class="card">
+   <p class="label">${d.s.length} slajdů</p><h2 class="q" style="font-size:20px;margin:0">${esc(d.title)}</h2>
+   <div class="slide" data-open="${d.id}" data-i="${at}"><img src="${prezImg(d.id,at)}" alt="${esc(d.s[at].t)}" loading="lazy"></div>
+   <p class="hint">${esc(d.desc)}</p>
+   <div class="row"><button class="btn" data-open="${d.id}" data-i="${at}">${at?`Pokračovat (slajd ${at+1})`:"Prohlížet"}</button><button class="btn ghost" data-off="${d.id}">Stáhnout offline</button></div>
+   <p class="hint"><a href="${d.url}" target="_blank" rel="noopener">Originál v Claude</a> – otevře se jen po přihlášení do Claude.</p></div>`}).join("")}</div>`;
+  view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>prezShow(b.dataset.open,+b.dataset.i));
+  view.querySelectorAll("[data-off]").forEach(b=>b.onclick=async()=>{const d=PREZ.find(x=>x.id===b.dataset.off);b.disabled=true;let ok=0;
+    for(let i=0;i<d.s.length;i++){try{const r=await fetch(prezImg(d.id,i));if(r.ok)ok++}catch(e){}b.textContent=`Stahuji ${i+1}/${d.s.length}`}
+    b.textContent=ok===d.s.length?"Uloženo pro offline ✓":`Staženo ${ok}/${d.s.length}`;log("offline "+d.id+": "+ok)});
+}
+function prezShow(did,i){
+  const d=PREZ.find(x=>x.id===did);if(!d)return prez();i=Math.max(0,Math.min(d.s.length-1,i||0));prezSave(did,i);
+  document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v==="prez"));
+  const sl=d.s[i],cur=[...d.sec].reverse().find(x=>x.i<=i);
+  view.innerHTML=`<div class="card">
+   <div class="meta"><span class="tag">${esc(d.title)}</span></div>
+   <select class="psec" id="psec" aria-label="Kapitola">${d.sec.map(x=>`<option value="${x.i}" ${cur&&cur.i===x.i?"selected":""}>${esc(x.t)}</option>`).join("")}</select>
+   <div class="slide" id="pslide"><img src="${prezImg(did,i)}" alt="${esc(sl.t)}"></div>
+   <div class="pnav"><button class="btn ghost" id="pprev" ${i?"":"disabled"} aria-label="Předchozí">‹</button><span class="pnum">${i+1} / ${d.s.length}</span><button class="btn ghost" id="pnext" ${i<d.s.length-1?"":"disabled"} aria-label="Další">›</button></div>
+   <p class="hint">Klepni na slajd – celá obrazovka (na telefonu na šířku). Přejetím prstem listuješ.</p><p class="label">${esc(sl.t)}</p>${sl.n?`<p class="notes">${esc(sl.n)}</p>`:""}
+   <div class="row"><button class="btn ghost" id="pback">Seznam prezentací</button></div></div>`;
+  if(i<d.s.length-1){const pre=new Image();pre.src=prezImg(did,i+1)}
+  $("#pprev").onclick=()=>prezShow(did,i-1);$("#pnext").onclick=()=>prezShow(did,i+1);$("#pback").onclick=()=>go("prez");
+  $("#psec").onchange=e=>prezShow(did,+e.target.value);
+  $("#pslide").onclick=()=>prezFull(did,i);
+  swipe($("#pslide"),dir=>prezShow(did,i+dir),false);
+  prezKeys=e=>{if(e.key==="ArrowRight")prezShow(did,i+1);else if(e.key==="ArrowLeft")prezShow(did,i-1)};
+}
+let prezKeys=null;document.addEventListener("keydown",e=>{if(prezKeys&&!$("#pfull")&&document.querySelector("#pslide"))prezKeys(e)});
+function swipe(el,cb,rot){let x0=null,y0=null;el.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+  el.addEventListener("touchend",e=>{if(x0===null||e.touches.length)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;x0=null;
+    const r=typeof rot==='function'?rot():rot,a=r?dy:dx,b=r?dx:dy;if(Math.abs(a)>50&&Math.abs(a)>Math.abs(b)*1.5){el.dataset.sw=1;cb(a<0?1:-1)}})}
+let prezCur=null;
+function prezClose(){const f=$("#pfull");if(!f)return;f.remove();prezCur&&prezShow(prezCur.did,prezCur.i);prezCur=null}
+function prezFull(did,i){
+  const d=PREZ.find(x=>x.id===did);prezCur={did,i};let f=$("#pfull");if(!f){f=document.createElement("div");f.id="pfull";document.body.appendChild(f);swipe(f,k=>prezCur&&prezNav(k),()=>innerHeight>innerWidth)}
+  const vw=document.documentElement.clientWidth,vh=document.documentElement.clientHeight,port=vh>vw,W=port?vh:vw,H=port?vw:vh;
+  f.innerHTML=`<button class="pclose" id="fclose" aria-label="Zavřít celou obrazovku">✕ Zavřít</button>
+   <div class="rot" style="width:${W}px;height:${H}px;${port?"transform:rotate(90deg)":""}"><img src="${prezImg(did,i)}" alt="${esc(d.s[i].t)}" style="max-height:${H-64}px;max-width:${W-24}px">
+   <div class="bar"><button id="fprev" aria-label="Předchozí" ${i?"":"disabled"}>‹</button><span>${i+1} / ${d.s.length}</span><button id="fnext" aria-label="Další" ${i<d.s.length-1?"":"disabled"}>›</button></div></div>`;
+  $("#fprev").onclick=e=>{e.stopPropagation();prezNav(-1)};$("#fnext").onclick=e=>{e.stopPropagation();prezNav(1)};
+  $("#fclose").onclick=e=>{e.stopPropagation();prezClose()};
+  f.onclick=e=>{if(e.target===f||e.target.classList.contains("rot"))prezClose()};
+  prezFullKeys=e=>{if(e.key==="Escape")prezClose();else if(e.key==="ArrowRight")prezNav(1);else if(e.key==="ArrowLeft")prezNav(-1)};
+}
+function prezNav(k){const d=PREZ.find(x=>x.id===prezCur.did),j=Math.max(0,Math.min(d.s.length-1,prezCur.i+k));if(j!==prezCur.i){prezSave(d.id,j);prezFull(d.id,j)}}
+addEventListener("resize",()=>{if($("#pfull")&&prezCur)prezFull(prezCur.did,prezCur.i)});
+let prezFullKeys=null;document.addEventListener("keydown",e=>{if($("#pfull")&&prezFullKeys)prezFullKeys(e)});
+const VIEWS={learn:learnHome,test:testHome,cards,prax,cheat,calc,stats,prez};
+function go(v){if(!VIEWS[v])v="learn";document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v));resetArm=false;clearInterval(timer);VIEWS[v]();
+  try{if(location.hash!=="#"+v)history.replaceState(null,"","#"+v)}catch(e){}}
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
+go((location.hash||"").slice(1));
+initCloud();
+</script>

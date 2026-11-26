@@ -9,7 +9,7 @@ Osobní PWA pro přípravu na přeškolení F-plynů: kat. I/II → A1/A2 a nov�
 
 ## Stack a nasazení
 - `prez/` obrázky slajdů; `index.html` (vše v jednom; otázky, lekce, tahák, tabulky sytosti CoolProp vložené), `sw.js` (cache `fplyny-N`), `manifest.webmanifest`, ikony (varianta B – modrá rodina).
-- Zdroj se generuje mimo repo (`build.py` + `build_pwa.py`); v repu jen výstup.
+- Zdroj je ve složce `src/` (app.html, questions.js, content.js, prez.js, sat.json, build.py, build_pwa.py, make_prez.py, prezentace/). Kořen repa je nasazený výstup. Postup buildu v `src/README.md`.
 - Supabase JS 2.45.4 z cdn.jsdelivr.net, Publishable key v `index.html`. Nikdy secret / service_role.
 - Nasazení: soubory do kořene repa; zvýšit `VERZE` (viditelné dole v appce) i `CACHE` v `sw.js`.
 

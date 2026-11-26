@@ -1,0 +1,95 @@
+/* F-plyny Přeškolení – výuková prezentace. Styl: bílé a pastelové karty, kreslené ikony, štítek kapitoly vpravo nahoře, box Zapamatuj si. Barevný proužek nahoře = barvy hadic manometru. */
+:root {
+  --ink: #1E2A3A;
+  --text: #2C3A4B;
+  --muted: #5B6675;
+  --paper: #FCFCFA;
+  --bg: #F4F5F2;
+  --navy: #1E4A8A;
+  --deep: #1E3A66;
+  --sky: #D6E6F5;
+  --mint: #D3EBE2;
+  --peach: #F8DCCB;
+  --sand: #F6EBCF;
+  --lilac: #E6DEF3;
+  --rose: #F4C9BC;
+  --low: #2F6FD0;
+  --high: #D23B33;
+  --yellow: #F2C230;
+}
+body { font-family: 'Nunito Sans', Arial, sans-serif; color: #1E2A3A; font-size: 34px; line-height: 1.3; }
+section { background: #F4F5F2; padding: 112px 128px 112px; display: flex; flex-direction: column; gap: 32px; }
+section.cover { background: #FCFCFA; }
+section.dark { background: #1E3A66; color: #F4F5F2; }
+
+.hose { position: absolute; left: 0; top: 0; width: 1920px; height: 18px; background: linear-gradient(90deg, #2F6FD0 0%, #2F6FD0 33.3%, #F2C230 33.3%, #F2C230 66.6%, #D23B33 66.6%, #D23B33 100%); }
+
+.head { display: flex; flex-direction: column; gap: 6px; width: 1340px; }
+.kicker { font-size: 28px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: #5B6675; }
+h1 { font-family: 'Montserrat', Arial, sans-serif; font-weight: 900; font-size: 150px; line-height: 0.98; letter-spacing: -3px; text-transform: uppercase; color: #1E2A3A; }
+h2 { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 74px; line-height: 1.06; letter-spacing: -1px; text-transform: uppercase; color: #1E2A3A; }
+.hl { color: #1E4A8A; }
+.tag { position: absolute; right: 128px; top: 104px; background: #1E4A8A; color: #FCFCFA; font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 26px; letter-spacing: 2px; text-transform: uppercase; padding: 12px 30px; border-radius: 40px; white-space: nowrap; }
+.sub { font-size: 34px; line-height: 1.3; color: #4A5568; }
+
+.grid { display: grid; gap: 28px; }
+.c2 { grid-template-columns: repeat(2, 1fr); }
+.c3 { grid-template-columns: repeat(3, 1fr); }
+.c4 { grid-template-columns: repeat(4, 1fr); }
+.c5 { grid-template-columns: repeat(5, 1fr); }
+.row { display: flex; gap: 32px; }
+.col { display: flex; flex-direction: column; gap: 24px; }
+.fill { flex: 1; }
+
+.tile { border-radius: 28px; padding: 28px 32px; display: flex; flex-direction: column; gap: 10px; }
+.sky { background: #D6E6F5; }
+.mint { background: #D3EBE2; }
+.peach { background: #F8DCCB; }
+.sand { background: #F6EBCF; }
+.lilac { background: #E6DEF3; }
+.rose { background: #F4C9BC; }
+.paper { background: #FCFCFA; border: 3px solid #DDE2E7; }
+h3 { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 42px; line-height: 1.12; color: #1E2A3A; }
+.txt { font-size: 36px; line-height: 1.28; color: #2C3A4B; }
+.ex { font-size: 30px; font-weight: 800; color: #1E4A8A; letter-spacing: 0.5px; }
+.ico { width: 120px; height: 100px; object-fit: contain; }
+.ill { object-fit: contain; }
+
+.remember { background: #F6EBCF; border: 3px dashed #C98A2E; border-radius: 28px; padding: 22px 36px; display: flex; gap: 32px; align-items: center; }
+.rlab { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 28px; letter-spacing: 3px; color: #8A4E0E; white-space: nowrap; }
+.rtxt { font-size: 35px; line-height: 1.3; color: #1E2A3A; }
+
+.big { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 84px; line-height: 1; color: #1E4A8A; }
+.unit { font-size: 30px; font-weight: 700; color: #4A5568; }
+.num { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 30px; color: #FCFCFA; background: #1E4A8A; width: 58px; height: 58px; border-radius: 29px; text-align: center; line-height: 58px; }
+.lbl { font-size: 31px; font-weight: 800; line-height: 1.2; color: #1E2A3A; }
+.lbl-w { font-size: 28px; font-weight: 800; line-height: 1.2; color: #1E2A3A; background: #FCFCFA; padding: 6px 14px; border-radius: 12px; }
+
+/* otázky a odpovědi */
+.qcard { background: #FCFCFA; border: 3px solid #DDE2E7; border-radius: 28px; padding: 30px 32px; display: flex; flex-direction: column; gap: 16px; }
+.qtext { font-size: 37px; font-weight: 800; line-height: 1.25; color: #1E2A3A; }
+.opt { font-size: 34px; line-height: 1.26; color: #2C3A4B; }
+.ans { background: #D3EBE2; color: #14532D; border-radius: 18px; padding: 14px 22px; font-size: 35px; font-weight: 800; line-height: 1.25; }
+.why { font-size: 34px; line-height: 1.3; color: #2C3A4B; }
+.qsmall { font-size: 30px; line-height: 1.25; color: #5B6675; font-weight: 700; }
+
+/* tmavý slajd */
+section.dark h2 { color: #FCFCFA; }
+section.dark .kicker { color: #F2C230; }
+.dtile { background: #24497F; border-radius: 24px; padding: 24px 30px; display: flex; flex-direction: column; gap: 6px; }
+.dt { font-size: 31px; line-height: 1.3; color: #E8EEF6; }
+.dh { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 34px; color: #F2C230; }
+
+/* tabulky */
+.tab { font-size: 31px; color: #1E2A3A; }
+.tab .thead { background: #1E4A8A; color: #FCFCFA; }
+.tab .r1 { background: #FCFCFA; }
+.tab .r2 { background: #EEF1F4; }
+
+/* časová osa */
+.axis { height: 10px; background: #1E2A3A; border-radius: 5px; }
+.dot { width: 44px; height: 44px; border-radius: 22px; border: 6px solid #1E2A3A; background: #F2C230; }
+.year { font-family: 'Montserrat', Arial, sans-serif; font-weight: 800; font-size: 52px; line-height: 1; color: #1E4A8A; }
+
+.rise { animation: rise 0.5s ease-out both; animation-delay: calc(var(--i, 0) * 90ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } }
