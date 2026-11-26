@@ -72,6 +72,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .opt b{font-family:var(--f-num);color:var(--muted);flex:0 0 auto}
 .opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
 .opt:disabled{cursor:default}
+.simg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.simv{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
+.simv span{font-size:12px;color:var(--muted)}.simv b{font:700 20px var(--f-num)}.simv small{font:500 11px var(--f-num);color:var(--muted)}
 .expl{border-left:4px solid var(--ok);background:var(--surface2);border-radius:0 10px 10px 0;padding:10px 12px;font-size:15px}
 .expl.wrong{border-left-color:var(--bad)}
 .expl .src{display:block;margin-top:6px;font:500 12px var(--f-num);color:var(--muted)}
@@ -156,7 +159,7 @@ dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:7
 
   </nav>
   <main id="view"></main>
-  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 14.</p>
+  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 15.</p>
 </div>
 
 <script>
@@ -988,14 +991,91 @@ function schBind(){
    g.classList.add(ok?"good":"wrong");setTimeout(()=>g.classList.remove("good","wrong"),700);
    schNewQ(ok?"správně":"ne, to byl "+SCH[id][0].toLowerCase(),id)});
  schInfo()}
+// ── simulátor poruch podle tlaků ──
+// Hodnoty jsou modelové (vlastní odhad typických servisních hodnot), tlaky z tabulek sytosti SAT (přetlak, bar).
+const SIM_DEV={R32:"klimatizace split, chlazení",R410A:"klimatizace split, chlazení",R134a:"chladicí vitrína"};
+const SIM={
+ ok:{n:"Bez poruchy – normální provoz",o:6,obr:"Tlaky odpovídají teplotám vzduchu, přehřátí 5–8 K, podchlazení 4–7 K.",
+  g:()=>({dt0:0,dtk:0,sh:rnd(5,8),sc:rnd(4,7)}),
+  i:c=>pick(["Průhledítko čisté, sací potrubí chladné, ale ne orosené až ke kompresoru.","Teplota na vstupu a výstupu filtru-dehydrátoru stejná, průhledítko plné."]),
+  e:"Vypařovací teplota je o obvyklých 8–15 K pod teplotou vzduchu do výparníku, kondenzační o 10–15 K nad teplotou vzduchu na kondenzátor, přehřátí i podchlazení v normálu. Nic neopravovat – zapsat naměřené hodnoty."},
+ malo:{n:"Nedostatek chladiva (únik)",o:8,obr:"Nízký sací i výtlačný tlak, velké přehřátí, malé podchlazení, bubliny v průhledítku.",
+  g:()=>({dt0:-rnd(5,9),dtk:-rnd(2,5),sh:rnd(15,25),sc:rnd(0,2)}),
+  i:()=>"V průhledítku proudí bubliny, na servisních ventilech a spojích olejové skvrny.",
+  e:"Výparník je „hladový“ – kapaliny je málo, vypaří se brzy a zbytek výparníku jen přehřívá páru. Málo kapaliny je i v kondenzátoru, proto skoro nulové podchlazení. Postup: najít a opravit únik (okruh 4), pak tlaková zkouška, vakuum a plnění vážením – nikdy jen dopouštět."},
+ moc:{n:"Přeplnění chladivem",o:7,obr:"Vysoký výtlačný tlak, velké podchlazení, přehřátí normální až nízké, klidový tlak odpovídá teplotě okolí.",
+  g:()=>({dt0:rnd(1,3),dtk:rnd(6,10),sh:rnd(2.5,5),sc:rnd(12,18)}),
+  i:c=>`Po vypnutí a vyrovnání se tlak ustálil na ${cz(c.pr,1)} bar – to odpovídá teplotě okolí ${cz(c.ta,0)} °C.`,
+  e:"Přebytečná kapalina zaplaví spodní část kondenzátoru – zmenší se plocha pro kondenzaci, roste tlak a kapalina se v kondenzátoru dlouho podchlazuje. Klidový tlak odpovídá tlaku sytosti při teplotě okolí, takže v okruhu není cizí plyn. Postup: odsát přebytek do recyklační láhve a náplň zkontrolovat vážením podle štítku."},
+ kond:{n:"Zanesený kondenzátor (málo vzduchu)",o:7,obr:"Vysoký výtlačný tlak, kondenzační teplota vysoko nad teplotou vzduchu, podchlazení normální.",
+  g:()=>({dt0:rnd(1,3),dtk:rnd(10,14),sh:rnd(5,8),sc:rnd(3,6)}),
+  i:()=>`Vzduch za kondenzátorem je o ${ri(17,22)} K teplejší než nasávaný (obvykle 8–12 K), proud kompresoru zvýšený.`,
+  e:"Kondenzátor nestíhá odvádět teplo, a tak stoupá kondenzační teplota i tlak – rozdíl kondenzační teploty a teploty vzduchu je výrazně větší než obvyklých 10–15 K. Náplň je v pořádku, proto je podchlazení normální. Velký ohřev vzduchu ukazuje na malý průtok vzduchu. Postup: vyčistit lamely, zkontrolovat ventilátor a nasávání (recirkulace teplého vzduchu)."},
+ filtr:{n:"Ucpaný filtr-dehydrátor",o:9,obr:"Nízký sací tlak, velké přehřátí, podchlazení normální až vyšší, teplotní spád na filtru.",
+  g:()=>({dt0:-rnd(4,8),dtk:-rnd(1,3),sh:rnd(14,24),sc:rnd(7,12)}),
+  i:()=>`Výstup filtru-dehydrátoru je o ${ri(5,9)} K chladnější než vstup a je orosený, za filtrem bubliny v průhledítku.`,
+  e:"Filtr škrtí průtok kapaliny – na něm vzniká tlaková ztráta, kapalina se za ním částečně odpaří (chladne, bubliny). Výparník dostává málo chladiva, proto nízký sací tlak a velké přehřátí. Chladivo zůstává v kondenzátoru, takže podchlazení není malé – tím se liší od nedostatku chladiva. Postup: znovuzískat chladivo, vyměnit filtr (pájet pod dusíkem), tlaková zkouška, vakuum, plnění."},
+ tev:{n:"Vadný nebo špatně nastavený TEV",o:9,obr:"Nedodává: nízký sací tlak, velké přehřátí, vyšší podchlazení, bez spádu na filtru. Přeplavuje: vyšší sací tlak, přehřátí kolem 0 K.",
+  g:()=>Math.random()<.55?{v:"zav",dt0:-rnd(4,8),dtk:-rnd(1,3),sh:rnd(15,25),sc:rnd(8,14)}:{v:"otv",dt0:rnd(2,4),dtk:rnd(0,1.5),sh:rnd(0,1.5),sc:rnd(3,5)},
+  i:c=>c.v==="zav"?"Teplota před a za filtrem-dehydrátorem stejná, průhledítko čisté bez bublin, TEV syčí.":"Sací potrubí orosené až namrzlé až ke kompresoru, tykavka volně visí na potrubí.",
+  e:c=>c.v==="zav"?"TEV pouští do výparníku málo kapaliny (přivřený stavěcí šroub, ztráta náplně tykavky, ucpané sítko nebo zamrzlá vlhkost). Výsledek je jako u nedostatku chladiva – nízký sací tlak a velké přehřátí –, ale chladiva je dost: hromadí se v kondenzátoru, podchlazení je vyšší a průhledítko čisté. Na filtru není teplotní spád, takže filtr je v pořádku. Postup: zkontrolovat tykavku a vyrovnání tlaku, sítko, nastavení, případně TEV vyměnit.":"TEV pouští moc kapaliny – tykavka nesnímá teplotu sání (uvolněná, neizolovaná) nebo je přehřátí nastavené příliš nízko. Přehřátí kolem 0 K znamená riziko nasátí kapaliny do kompresoru (kapalinový ráz). Sací tlak je naopak vyšší. Postup: připevnit a zaizolovat tykavku, nastavit přehřátí na 5–8 K."},
+ nkp:{n:"Nekondenzující plyny (vzduch v okruhu)",o:7,obr:"Vysoký výtlačný tlak, zdánlivě větší podchlazení, klidový tlak vyšší než tlak sytosti při teplotě okolí.",
+  g:()=>({dt0:rnd(.5,2),dtk:rnd(6,10),sh:rnd(5,8),sc:rnd(8,12),ncg:rnd(1.5,3)}),
+  i:c=>`Po vypnutí a vyrovnání se tlak ustálil na ${cz(c.pr,1)} bar, teplota okolí ${cz(c.ta,0)} °C (tlak sytosti ${cz(c.pse,1)} bar).`,
+  e:"Vzduch nebo dusík se drží v kondenzátoru a přičítá svůj parciální tlak – manometr ukazuje vyšší tlak, než odpovídá skutečné kondenzaci, a podchlazení vypočtené z tlaku vychází zdánlivě větší. Rozhodne klidový tlak: v okruhu s čistým chladivem se po vyrovnání ustálí na tlaku sytosti při teplotě okolí, tady je vyšší. Příčina: nedostatečné vakuování nebo neodvzdušněné hadice. Postup: znovuzískat chladivo, vyvakuovat, naplnit novým chladivem vážením."},
+ vyp:{n:"Namrzlý výparník (málo vzduchu)",o:8,obr:"Nízký sací tlak, malé přehřátí, podchlazení normální, námraza na výparníku.",
+  g:()=>({dt0:-rnd(7,10),dtk:-rnd(1,3),sh:rnd(1,3),sc:rnd(4,7)}),
+  i:()=>pick(["Lamely výparníku pokryté námrazou, z vnitřní jednotky fouká málo vzduchu.","Ucpaný vzduchový filtr vnitřní jednotky, na výparníku námraza."]),
+  e:"Výparník nedostává teplo (málo vzduchu, zanesený filtr, námraza izoluje lamely). Kapalina se nestihne vypařit, proto je nízký sací tlak a zároveň malé přehřátí – tím se liší od nedostatku chladiva i ucpaného filtru, kde je přehřátí velké. Hrozí nasátí kapaliny do kompresoru. Postup: odtát, vyčistit filtr a lamely, zkontrolovat ventilátor výparníku."}
+};
+const SIM_ORD=["ok","malo","moc","kond","filtr","tev","nkp","vyp"];
+let simRef="vse",simCur=null,simScore=[0,0];
+const pAt=(r,arr,t)=>{const T=r.t;if(t<=T[0])return arr[0];for(let i=1;i<T.length;i++)if(t<=T[i]){const f=(t-T[i-1])/(T[i]-T[i-1]);return arr[i-1]+f*(arr[i]-arr[i-1])}return arr[arr.length-1]};
+const cz1=x=>Number(x).toLocaleString("cs-CZ",{minimumFractionDigits:1,maximumFractionDigits:1});
+const r1=x=>Math.round(x*10)/10;
+function simNew(){const k=simRef==="vse"?pick(["R32","R410A","R134a"]):simRef,r=SAT[k],box=k==="R134a",f=pick(SIM_ORD),d=SIM[f].g();
+ const ta=box?ri(20,28):ri(24,33), ti=box?ri(2,6):ri(23,27);
+ const t0=r1((box?ti-rnd(8,10):ti-rnd(13,16))+d.dt0), tk=r1(Math.min(58,ta+rnd(11,14)+d.dtk));
+ const ps=+pAt(r,r.d,t0).toFixed(1), pd=+(pAt(r,r.b,tk)).toFixed(1);
+ // teploty sytosti zpět z tlaku (jako technik s tabulkou)
+ const T0=satT(r.t,r.d,ps), TK=satT(r.t,r.b,pd), tsuc=r1(T0+d.sh), tliq=r1(TK-d.sc);
+ const pse=+pAt(r,r.b,ta).toFixed(1), pr=+(pse+(d.ncg||0)).toFixed(1);
+ const c={k,box,f,ta,ti,ps,pd,T0,TK,tsuc,tliq,sh:Math.max(0,tsuc-T0),sc:Math.max(0,TK-tliq),pr,pse,v:d.v,psuc:ps};
+ c.clue=SIM[f].i(c);simCur=c;simDraw()}
+function simVal(lbl,val,u,sub){return `<div class="simv"><span>${lbl}</span><b>${val}</b><small>${u}${sub?" · "+sub:""}</small></div>`}
+function simDraw(pickId){const c=simCur,b=$("#simbody");if(!b||!c)return;const ans=pickId!=null,ok=ans&&pickId===c.f,F=SIM[c.f];
+ b.innerHTML=`<p class="tag" style="align-self:flex-start;margin-top:8px;display:inline-block">${c.k} · ${SIM_DEV[c.k]} · správně ${simScore[0]}/${simScore[1]}</p>
+ <div class="simg">
+  <p class="label" style="grid-column:1/-1;margin:4px 0 0;color:var(--low)">Sání (nízký tlak)</p>
+  ${simVal("Sací tlak",cz1(c.psuc),"bar",`t<sub>0</sub> ${cz1(c.T0)} °C`)}${simVal("Teplota sání",cz1(c.tsuc),"°C")}
+  ${simVal("Přehřátí",cz1(c.sh),"K","norma 5–8")}${simVal(c.box?"Vzduch ve vitríně":"Vzduch do výparníku",cz(c.ti,0),"°C")}
+  <p class="label" style="grid-column:1/-1;margin:4px 0 0;color:var(--high)">Výtlak (vysoký tlak)</p>
+  ${simVal("Výtlačný tlak",cz1(c.pd),"bar",`t<sub>k</sub> ${cz1(c.TK)} °C`)}${simVal("Teplota kapaliny",cz1(c.tliq),"°C")}
+  ${simVal("Podchlazení",cz1(c.sc),"K","norma 4–7")}${simVal(c.box?"Vzduch v prodejně":"Venkovní vzduch",cz(c.ta,0),"°C")}
+ </div>
+ <p class="hint" style="margin:8px 0 0"><b>Indicie:</b> ${esc(c.clue)}</p>
+ <p class="note" style="margin:4px 0 0">Tlaky jsou přetlak. t<sub>0</sub> a t<sub>k</sub> z tabulek sytosti v appce (${c.k}).</p>
+ <p class="label" style="margin-top:12px">${ans?"Výsledek":"Jaká je příčina?"}</p>
+ <div class="opts">${SIM_ORD.map(id=>{const cls=ans?(id===c.f?" ok":id===pickId?" bad":""):"";return `<button class="opt${cls}" data-sim="${id}"${ans?" disabled":""}><span>${esc(SIM[id].n)}</span></button>`}).join("")}</div>
+ ${ans?`<div class="expl${ok?"":" wrong"}" style="margin-top:10px"><b>${ok?"Správně.":"Ne – je to: "+esc(F.n)+"."}</b> <span class="tag">okruh ${F.o}</span>
+  <p style="margin:6px 0 0">${esc(typeof F.e==="function"?F.e(c):F.e)}</p>
+  <p style="margin:6px 0 0"><b>Naměřeno:</b> t<sub>0</sub> ${cz1(c.T0)} °C (vzduch ${cz(c.ti,0)} °C, rozdíl ${cz(c.ti-c.T0,0)} K) · t<sub>k</sub> ${cz1(c.TK)} °C (vzduch ${cz(c.ta,0)} °C, rozdíl ${cz(c.TK-c.ta,0)} K) · přehřátí ${cz1(c.sh)} K · podchlazení ${cz1(c.sc)} K.</p>
+  ${ok?"":`<p style="margin:6px 0 0" class="hint"><b>${esc(SIM[pickId].n)}</b> by vypadal(a): ${esc(SIM[pickId].obr)}</p>`}</div>
+  <div class="row" style="margin-top:10px"><button class="btn" id="simnext">Další porucha</button><button class="btn ghost" id="simokr">Procvičit okruh ${F.o}</button></div>
+  <p class="note">Okruh ${F.o}: ${esc(OKRUHY[F.o])}. Hodnoty jsou modelové, skutečné zařízení se může lišit.</p>`:""}`;
+ if(!ans)b.querySelectorAll("[data-sim]").forEach(x=>x.onclick=()=>{simScore[1]++;if(x.dataset.sim===c.f)simScore[0]++;simDraw(x.dataset.sim)});
+ else{$("#simnext").onclick=simNew;$("#simokr").onclick=()=>{document.querySelectorAll("#nav button").forEach(n=>n.setAttribute("aria-pressed",n.dataset.v==="learn"));okrPractice(F.o)}}}
+function simCard(){return `<div class="card" id="simcard"><p class="label">Simulátor poruch podle tlaků</p><p class="hint">Z tlaků, přehřátí, podchlazení a teplot vzduchu urči příčinu. Občas je zařízení v pořádku.</p>
+ <div class="chips">${[["vse","Vše"],["R32","R32"],["R410A","R410A"],["R134a","R134a"]].map(([k,n])=>`<button class="chip" data-simr="${k}" aria-pressed="${simRef===k}">${n}</button>`).join("")}</div><div id="simbody"></div></div>`}
+function simBind(){document.querySelectorAll("[data-simr]").forEach(ch=>ch.onclick=()=>{simRef=ch.dataset.simr;document.querySelectorAll("[data-simr]").forEach(x=>x.setAttribute("aria-pressed",x===ch));simNew()});if(simCur&&(simRef==="vse"||simCur.k===simRef))simDraw();else simNew()}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
-  schBind();ordBind();
+  schBind();simBind();ordBind();
 }
 // ── kartičky ──
 function cards(){
