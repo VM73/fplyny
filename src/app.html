@@ -58,6 +58,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .opt b{font-family:var(--f-num);color:var(--muted);flex:0 0 auto}
 .opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
 .opt:disabled{cursor:default}
+.vacg{width:100%;max-width:460px;display:block;margin:4px auto 0}.vacg .gl{stroke:var(--line);stroke-width:1}.vacg .ax{font:500 9px var(--f-num);fill:var(--muted)}.vacg .lim{stroke:var(--ok);stroke-width:1.2;stroke-dasharray:4 3}.vacg .lim2{fill:var(--ok)}.vacg .cv{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.vacm{margin-top:8px;background:#0f1a14;color:#7dffb0;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-num)}.vacm span{font-size:12px;opacity:.8}.vacm b{font-size:30px;line-height:1.15}.vacm small{font-size:12px;opacity:.85}
 .simg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
 .simv{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
 .simv span{font-size:12px;color:var(--muted)}.simv b{font:700 20px var(--f-num)}.simv small{font:500 11px var(--f-num);color:var(--muted)}
@@ -533,14 +535,76 @@ function simDraw(pickId){const c=simCur,b=$("#simbody");if(!b||!c)return;const a
 function simCard(){return `<div class="card" id="simcard"><p class="label">Simulátor poruch podle tlaků</p><p class="hint">Z tlaků, přehřátí, podchlazení a teplot vzduchu urči příčinu. Občas je zařízení v pořádku.</p>
  <div class="chips">${[["vse","Vše"],["R32","R32"],["R410A","R410A"],["R134a","R134a"]].map(([k,n])=>`<button class="chip" data-simr="${k}" aria-pressed="${simRef===k}">${n}</button>`).join("")}</div><div id="simbody"></div></div>`}
 function simBind(){document.querySelectorAll("[data-simr]").forEach(ch=>ch.onclick=()=>{simRef=ch.dataset.simr;document.querySelectorAll("[data-simr]").forEach(x=>x.setAttribute("aria-pressed",x===ch));simNew()});if(simCur&&(simRef==="vse"||simCur.k===simRef))simDraw();else simNew()}
+// ── vakuování a test nárůstu tlaku ──
+// Modelové křivky (vlastní), hodnoty v µm Hg (mikrony). 1 µm Hg = 0,1333 Pa = 0,001333 mbar.
+const VAC={
+ ok:{n:"Suchý a těsný – lze plnit",o:3,
+  e:"Po zavření ventilu tlak jen mírně vzroste (odplynění hadic a oleje) a ustálí se pod 500 µm. Okruh je suchý a těsný. Postup: odpojit vývěvu, u splitu otevřít nejdřív kapalinový, pak plynový ventil, nebo plnit vážením; zápis."},
+ vlh:{n:"Vlhkost v okruhu – vakuovat dál",o:10,
+  e:"Tlak rychle vystoupá a pak se ustálí – v okruhu se odpařuje voda, dokud se nevyrovná její tlak par. Okruh je těsný, ale vlhký. Postup: vakuovat dál, okruh ohřát, případně trojí vakuování (vakuum zlomit suchým dusíkem a znovu vakuovat); vyměnit olej ve vývěvě, pokud vlhkost pohltil."},
+ net:{n:"Netěsnost – zpět k tlakové zkoušce",o:4,
+  e:"Tlak roste plynule pořád dál a neustálí se – do okruhu přisává vzduch zvenku. Vakuum netěsnost neumí najít ani spolehlivě vyloučit. Postup: natlakovat suchým dusíkem, najít únik (pěnotvorný roztok), opravit, tlaková zkouška a znovu vakuovat."},
+ led:{n:"Zamrzlá vlhkost – ohřát a vakuovat znovu",o:10,
+  e:"V zimě a při rychlém vakuování se voda v potrubí odpařováním ochladí a zmrzne. Led se odpařuje (sublimuje) jen pomalu, a tak vakuometr nejdřív ukáže podezřele rychle dobré vakuum. Po zavření ventilu tlak roste pomaleji než u běžné vlhkosti a ustaluje se až ke konci testu, vysoko nad 500 µm. Postup: potrubí a jednotku ohřát (teplovzdušná pistole, počkat na teplejší počasí), vakuovat déle, trojí vakuování s dusíkem."}
+};
+const VAC_ORD=["ok","vlh","net","led"];
+let vacCur=null,vacScore=[0,0],vacTimer=null;
+const mbar=u=>u*0.0013332, umF=u=>Math.round(u).toLocaleString("cs-CZ");
+function vacNew(){clearInterval(vacTimer);const f=pick(VAC_ORD),c={f};
+ c.amb=f==="led"?ri(-6,1):ri(14,26);c.len=pick([3,5,8,12,15]);
+ c.tv=f==="led"?ri(10,14):f==="vlh"?ri(45,60):ri(30,45); // délka vakuování min
+ c.p0=f==="led"?ri(320,420):f==="net"?ri(380,470):f==="vlh"?ri(400,480):ri(220,350);
+ const A=f==="ok"?rnd(40,100):f==="vlh"?rnd(900,2000):f==="led"?rnd(1100,2400):0,tau=f==="led"?rnd(5,7):rnd(1.6,2.6),r=rnd(150,330);
+ c.rise=t=>f==="net"?c.p0+r*t+8*t*t:c.p0+A*(1-Math.exp(-t/tau));
+ c.vac=t=>{const x=t/c.tv;return Math.exp(Math.log(760000)+(Math.log(c.p0)-Math.log(760000))*Math.min(1,1-Math.pow(1-Math.min(1,x),2.4)))};
+ c.d5=c.rise(15)-c.rise(10);c.clue=f==="led"?`Venku ${c.amb} °C, vakuum pod 500 µm za pouhých ${c.tv} min, potrubí u servisní přípojky se orosilo.`:`Venku ${c.amb} °C, vakuováno ${c.tv} min dvoustupňovou vývěvou.`;
+ vacCur=c;vacDraw(null,true)}
+function vacGraph(c,ph,tt){ // ph 0 vakuování (log), 1 test (lineární)
+ const W=320,H=150,L=44,R=8,T=10,B=24,iw=W-L-R,ih=H-T-B;let x,y,ticks,maxX,pts=[];
+ if(!ph){maxX=c.tv;const lo=Math.log10(100),hi=Math.log10(1e6);x=t=>L+t/maxX*iw;y=p=>T+(hi-Math.log10(Math.max(100,p)))/(hi-lo)*ih;ticks=[100,1000,1e4,1e5,1e6].map(v=>[v,v>=1e4?(v/1000)+"k":String(v)]);
+  for(let i=0;i<=60;i++){const t=i/60*Math.min(tt,maxX);pts.push([x(t),y(c.vac(t))])}}
+ else{maxX=15;const top=Math.max(1500,Math.ceil(c.rise(15)/500)*500+500);x=t=>L+t/maxX*iw;y=p=>T+(1-p/top)*ih;ticks=[];for(let v=0;v<=top;v+=top>3000?1000:500)ticks.push([v,umF(v)]);
+  for(let i=0;i<=60;i++){const t=i/60*Math.min(tt,15);pts.push([x(t),y(c.rise(t))])}}
+ const xt=ph?[0,5,10,15]:[0,Math.round(maxX/2),maxX];
+ return `<svg viewBox="0 0 ${W} ${H}" class="vacg" role="img" aria-label="${ph?"Test nárůstu tlaku":"Průběh vakuování"}">
+ ${ticks.map(([v,l])=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="gl"/><text x="${L-4}" y="${y(v)+3}" class="ax" text-anchor="end">${l}</text>`).join("")}
+ ${xt.map((t,i)=>`<text x="${x(t)}" y="${H-8}" class="ax" text-anchor="${i===xt.length-1?"end":i?"middle":"start"}">${t}${i===xt.length-1?" min":""}</text>`).join("")}
+ <line x1="${L}" x2="${W-R}" y1="${y(500)}" y2="${y(500)}" class="lim"/><text x="${W-R}" y="${y(500)-3}" class="ax lim2" text-anchor="end">500 µm</text>
+ <polyline points="${pts.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ")}" class="cv"/></svg>`}
+function vacDraw(pickId,anim){const c=vacCur,b=$("#vacbody");if(!b||!c)return;const ans=pickId!=null,ok=ans&&pickId===c.f,F=VAC[c.f];
+ b.innerHTML=`<p class="tag" style="display:inline-block;margin-top:8px">${esc(c.clue.split(",")[0])} · správně ${vacScore[0]}/${vacScore[1]}</p>
+ <div class="vacm"><span id="vacph">Vakuování</span><b id="vacu">760 000</b><small id="vacmb">µm Hg · 1 013 mbar</small></div>
+ <p class="label" style="margin:8px 0 0">1. Vakuování</p><div id="vacg0"></div>
+ <p class="label" style="margin:6px 0 0">2. Test nárůstu tlaku – vývěva vypnutá, ventil zavřený</p><div id="vacg1"></div>
+ <div id="vacrest"></div>`;
+ const step=(t0,t1)=>{$("#vacg0").innerHTML=vacGraph(c,0,t0);$("#vacg1").innerHTML=vacGraph(c,1,t1);
+  const u=t1>0?c.rise(t1):c.vac(t0);$("#vacu").textContent=umF(u);$("#vacmb").textContent=`µm Hg · ${cz(mbar(u),u<7500?2:0)} mbar · ${cz(u*0.13332,0)} Pa`;$("#vacph").textContent=t1>0?`Test nárůstu · ${cz(t1,1)} min`:t0>=c.tv?"Ventil zavřen":`Vakuování · ${Math.round(t0)} min`};
+ const rest=()=>{const r=$("#vacrest");r.innerHTML=`<p class="hint" style="margin:8px 0 0"><b>Situace:</b> ${esc(c.clue)} Nárůst za posledních 5 min: <b>${umF(c.d5)} µm</b>.</p>
+  <p class="label" style="margin-top:12px">${ans?"Výsledek":"Co z toho vyvodíš?"}</p>
+  <div class="opts">${VAC_ORD.map(id=>{const cls=ans?(id===c.f?" ok":id===pickId?" bad":""):"";return `<button class="opt${cls}" data-vac="${id}"${ans?" disabled":""}><span>${esc(VAC[id].n)}</span></button>`}).join("")}</div>
+  ${ans?`<div class="expl${ok?"":" wrong"}" style="margin-top:10px"><b>${ok?"Správně.":"Ne – je to: "+esc(F.n)+"."}</b> <span class="tag">okruh ${F.o}</span><p style="margin:6px 0 0">${esc(F.e)}</p>
+   <p style="margin:6px 0 0" class="hint">Vodítko: drží pod 500 µm = v pořádku · vzroste a ustálí se = vlhkost · roste pořád = netěsnost · v mrazu rychlé „dobré“ vakuum a pak pomalý nárůst = led.</p></div>
+   <div class="row" style="margin-top:10px"><button class="btn" id="vacnext">Další test</button><button class="btn ghost" id="vacokr">Procvičit okruh ${F.o}</button></div>
+   <p class="note">Okruh ${F.o}: ${esc(OKRUHY[F.o])}. Křivky jsou modelové.</p>`:`<button class="btn ghost" id="vacrep" style="margin-top:8px">Přehrát znovu</button>`}`;
+  if(!ans){r.querySelectorAll("[data-vac]").forEach(x=>x.onclick=()=>{vacScore[1]++;if(x.dataset.vac===c.f)vacScore[0]++;vacDraw(x.dataset.vac)});$("#vacrep").onclick=()=>vacDraw(null,true)}
+  else{$("#vacnext").onclick=vacNew;$("#vacokr").onclick=()=>{document.querySelectorAll("#nav button").forEach(n=>n.setAttribute("aria-pressed",n.dataset.v==="learn"));okrPractice(F.o)}}};
+ clearInterval(vacTimer);
+ const still=!anim||matchMedia("(prefers-reduced-motion: reduce)").matches;
+ if(still){step(c.tv,15);rest();return}
+ let k=0;const N=70;$("#vacrest").innerHTML=`<button class="btn ghost" id="vacskip" style="margin-top:8px">Přeskočit animaci</button>`;
+ $("#vacskip").onclick=()=>{clearInterval(vacTimer);step(c.tv,15);rest()};
+ vacTimer=setInterval(()=>{k++;if(!document.body.contains(b)){clearInterval(vacTimer);return}
+  if(k<=25)step(c.tv*k/25,0);else if(k<=N)step(c.tv,15*(k-25)/(N-25));else{clearInterval(vacTimer);rest()}},60)}
+function vacCard(){return `<div class="card" id="vaccard"><p class="label">Vakuum a test nárůstu tlaku</p><p class="hint">Split, nové potrubí po tlakové zkoušce. Sleduj vakuometr a z průběhu po zavření ventilu urči stav okruhu.</p><div id="vacbody"></div></div>`}
+function vacBind(){if(vacCur)vacDraw(null,false);else vacNew()}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${vacCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
-  schBind();simBind();ordBind();
+  schBind();simBind();vacBind();ordBind();
 }
 // ── kartičky ──
 function cards(){

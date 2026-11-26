@@ -2,7 +2,7 @@
 Vstup: fplyny.html (verze pro Claude). Výstup: pwa/ (index.html, sw.js, manifest, ikony).
 Úložiště Claude se nahradí Supabase (osobní projekt, schéma fplyny, tabulka pokrok)."""
 import os, re, shutil
-VERZE = "verze 15"
+VERZE = "verze 16"
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "pwa")
 os.makedirs(OUT, exist_ok=True)
