@@ -145,7 +145,7 @@ dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:7
 
   </nav>
   <main id="view"></main>
-  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 10.</p>
+  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 11.</p>
 </div>
 
 <script>
@@ -161,7 +161,8 @@ const MODULES = {
   bez: { name: "Bezpečnost práce", cat: "A1 · A2" },
   ene: { name: "Energetická účinnost", cat: "A1 · A2" },
   co2: { name: "CO₂ – R744", cat: "B" },
-  nh3: { name: "Čpavek – R717", cat: "C" }
+  nh3: { name: "Čpavek – R717", cat: "C" },
+  sit: { name: "Situace z praxe", cat: "A1 · A2" }
 };
 
 const Q = [
@@ -344,7 +345,90 @@ const Q = [
 {m:"hor",q:"Jaké intervaly kontrol těsnosti platí pro zařízení s uhlovodíky (R290, R600a)?",a:["Zákon je nestanoví jako u F-plynů; kontroluje se při uvedení do provozu, po zásahu do okruhu a podle výrobce", "Každé 3 měsíce", "Každých 12 měsíců od 5 t CO₂e", "Jednou za 7 let"],e:"U A2L F-plynů (R32, HFO) se ale řídí nařízením 2024/573.",s:"podklad SCHKT · EN 378"},
 {m:"hor",q:"Platí ADR pro přepravu zařízení naplněných hořlavým chladivem pod 12 kg náplně?",a:["Ne, požadavky ADR se nevztahují (nejvýše 1000 zařízení na vozidlo)", "Ano, vždy", "Přeprava je zakázána", "Jen s doprovodem hasičů"],e:"U nádob s hořlavým plynem je limit 333 kg – nad něj další opatření ADR. Vozidlo větrané, hasicí přístroj 2 kg, ventily zavřené.",s:"podklad SCHKT · EN 378"},
 {m:"hor",q:"Kdy se nesmí vynulovat přenosný detektor hořlavých chladiv?",a:["V prostoru, kde už může být uniklé chladivo", "Venku na čerstvém vzduchu", "Po zapnutí", "Nikdy se nenuluje"],e:"Vynulovaný v kontaminovaném vzduchu by koncentraci podhodnocoval. Má hlásit při 20 % LFL.",s:"podklad SCHKT · EN 378"},
+// ───────── SITUACE Z PRAXE (v11) ─────────
+{m:"sit",q:"Zákazník chce „jen doplnit“ chladivo do splitu, který každý rok ztrácí náplň. Co uděláš?",a:["Nejdřív najdu a opravím únik, pak tlaková zkouška, vakuum a náplň vážením", "Doplním podle tlaků, je to rychlejší", "Doplním a doporučím přijít za rok", "Odmítnu cokoli dělat"],e:"Opakované doplňování bez opravy úniku je v rozporu s povinností únik bez zbytečného odkladu opravit; účinnost opravy se ověří do 1 měsíce.",s:""},
+{m:"sit",q:"Po vakuování uzavřeš ventil k vývěvě a tlak v okruhu pomalu stoupá a pak se ustálí. Co to znamená?",a:["V okruhu je vlhkost – vakuovat dál", "Okruh je netěsný", "Vakuometr je vadný", "Vše je v pořádku, plnit"],e:"Ustálení po nárůstu = odpařující se vlhkost. Trvalý lineární nárůst = netěsnost.",s:""},
+{m:"sit",q:"Po vakuování tlak v okruhu stále rovnoměrně roste a neustálí se. Co uděláš?",a:["Hledám netěsnost – tlaková zkouška dusíkem a kontrola spojů", "Vakuuji ještě hodinu a plním", "Plním, chladivo únik ucpe", "Vyměním olej ve vývěvě a plním"],e:"Trvalý nárůst znamená, že do okruhu proniká vzduch – je netěsný.",s:""},
+{m:"sit",q:"Na zkoušce máš naplnit R407C. Jak plníš?",a:["Kapalnou fází, vážením", "Plynnou fází do sání bez vážení", "Podle zamrznutí sání", "Libovolně, je to jednosložkové chladivo"],e:"R407C je zeotropní směs se skluzem ~7 K. V plynné fázi by se změnilo složení náplně.",s:""},
+{m:"sit",q:"Na split klimatizaci s R410A je náplň 2,8 kg. Musí mít pravidelné kontroly těsnosti?",a:["Ano – je to 5,85 t CO₂e, tedy nad 5 t", "Ne – je pod 3 kg", "Ne – split nikdy", "Jen jednou za 7 let"],e:"2,8 × 2088 / 1000 = 5,85 t CO₂e → kontrola alespoň každých 12 měsíců (bez systému detekce úniku).",s:""},
+{m:"sit",q:"Při kontrole najdeš na kapalinovém potrubí u lemového spoje olejovou skvrnu. Co to obvykle znamená?",a:["Pravděpodobný únik chladiva i s olejem – ověřit detektorem", "Přebytečný olej z montáže, nic nedělat", "Kondenzát", "Únik oleje z kompresoru bez chladiva"],e:"Olej cirkuluje s chladivem; kde uniká chladivo, často zůstane olejová skvrna. Ověřit detektorem nebo sprejem.",s:""},
+{m:"sit",q:"Klimatizace málo chladí: nízký sací tlak, vysoké přehřátí, nízké podchlazení. Co je nejpravděpodobnější?",a:["Nedostatek chladiva (únik)", "Přeplnění chladivem", "Zanesený kondenzátor", "Vzduch v okruhu"],e:"Málo chladiva = nízký výparný tlak, výparník „hladoví“ (velké přehřátí) a v kondenzátoru je málo kapaliny (malé podchlazení).",s:""},
+{m:"sit",q:"Vysoký kondenzační tlak, vysoké podchlazení, normální přehřátí. Co je nejpravděpodobnější?",a:["Přeplnění chladivem", "Nedostatek chladiva", "Ucpaný filtrdehydrátor", "Nízký průtok vzduchu výparníkem"],e:"Přebytek kapaliny zaplaví kondenzátor – zvýší tlak i podchlazení.",s:""},
+{m:"sit",q:"Vysoký kondenzační tlak a malé podchlazení, kondenzátor je hodně zanesený prachem. Co nejdřív?",a:["Vyčistit kondenzátor a znovu změřit", "Odsát část chladiva", "Doplnit chladivo", "Vyměnit kompresor"],e:"Špatný odvod tepla zvedá kondenzační tlak. Náplň se posuzuje až po vyčištění.",s:""},
+{m:"sit",q:"Na filtrdehydrátoru je citelný teplotní rozdíl (za filtrem studenější, orosený). Co to ukazuje?",a:["Ucpaný filtr – škrcení ve filtru", "Správnou funkci filtru", "Přeplnění", "Vlhkost v oleji kompresoru"],e:"Tlaková ztráta ve filtru způsobí částečné vypaření a ochlazení za filtrem.",s:""},
+{m:"sit",q:"Zákazník chce do starého zařízení na R404A naplnit propan, „je to ekologické“. Co mu řekneš?",a:["Nelze – zařízení není konstruované pro hořlavé chladivo", "Lze bez úprav", "Lze po výměně oleje", "Lze při náplni do 3 kg"],e:"Hořlavé chladivo jen do zařízení pro něj navrženého (elektrika, náplň, umístění podle EN 378).",s:""},
+{m:"sit",q:"Od 1. 1. 2025 servisuješ chladicí zařízení s 50 kg R404A. Smíš doplnit nové (panenské) R404A?",a:["Ne – GWP ≥ 2 500; lze jen regenerované nebo recyklované, a to do konce roku 2029", "Ano, bez omezení", "Ano, do 40 t CO₂e", "Jen když je zařízení starší než 10 let"],e:"50 kg R404A = 196 t CO₂e. Zákaz servisu novým chladivem s GWP ≥ 2 500 platí od 2025; recyklát je povolen do konce 2029.",s:""},
+{m:"sit",q:"Kolega chce vypustit zbytek R410A z okruhu do ovzduší, „je to jen 200 g“. Co platí?",a:["Úmyslný únik F-plynů je zakázán – musí se odsát", "Do 1 kg je to povoleno", "Venku je to povoleno", "Povoleno, pokud se zapíše"],e:"Znovuzískání je povinné; úmyslné vypouštění je zakázáno bez ohledu na množství.",s:""},
+{m:"sit",q:"Po výměně kompresoru jsi okruh naplnil, ale nemáš kde zapsat záznam. Komu patří záznamy o zařízení?",a:["Provozovatel je vede; servisní firma dodá údaje (a sama uchovává kopii)", "Nikomu, u splitu se nevedou", "Jen výrobci", "Jen dodavateli chladiva"],e:"Záznamy se uchovávají alespoň 5 let – provozovatel i firma, která práci provedla.",s:""},
+{m:"sit",q:"Při plnění R32 do splitu v bytě zjistíš, že v místnosti je zapnutý plynový sporák. Co uděláš?",a:["Zdroj zapálení vypnout a zajistit větrání před otevřením okruhu", "Pokračovat, R32 je A1", "Pokračovat, R32 nehoří", "Jen otevřít okno"],e:"R32 je A2L – mírně hořlavé. Žádné zdroje zapálení v blízkosti, větrání, u větších zásahů detektor.",s:""},
+{m:"sit",q:"Odsáváš chladivo a recyklační láhev se zahřívá a tlak v ní stoupá. Co uděláš?",a:["Hlídám váhu a tlak, láhev chladím, nepřekročím max. náplň", "Zvýším otáčky odsávačky", "Láhev postavím na slunce", "Odpojím váhu"],e:"Láhev se nesmí přeplnit (max. ~80 % objemu kapalinou) ani přehřát.",s:""},
+{m:"sit",q:"Detektor úniku nepípá, ale na sací straně splitu v provozu máš podezření na únik. Co je chyba?",a:["NT stranu kontrolovat raději při vypnutém systému – tlak je vyšší", "Detektor se nemá kalibrovat", "Na NT straně únik nikdy nevzniká", "Je nutné nejdřív okruh vyvakuovat"],e:"Při odstávce se tlaky vyrovnají a na NT straně stoupnou – únik se snáz najde.",s:""},
+{m:"sit",q:"U tepelného čerpadla vzduch–voda s 6 kg R410A zákazník nechce kontrolu těsnosti, „protože je to nové“. Co platí?",a:["Kontrola je povinná – 12,5 t CO₂e, alespoň každých 12 měsíců", "Prvních 5 let je nepovinná", "Je povinná jen u chlazení", "Stačí kontrola výrobce při výrobě"],e:"6 × 2088 / 1000 = 12,5 t CO₂e → interval 12 měsíců (bez systému detekce).",s:""},
+{m:"sit",q:"Při tlakové zkoušce dusíkem večer 30 bar při 25 °C, ráno 29 bar při 15 °C. Je okruh netěsný?",a:["Spíš ne – pokles odpovídá ochlazení (přepočet na teplotu)", "Ano, pokles o 1 bar je vždy únik", "Nelze posoudit, dusík se rozpouští v oleji", "Ano, tlak se nesmí měnit"],e:"(31,0 × 288/298) − 1 ≈ 28,9 bar – pokles je vysvětlen teplotou.",s:""},
+{m:"sit",q:"Na zkoušce tě komise požádá popsat okruh. Kde je v kondenzátoru chladivo podchlazené?",a:["Na výstupu z kondenzátoru, v kapalině", "Na vstupu z kompresoru", "V sacím potrubí", "V kompresoru"],e:"Na vstupu je přehřátá pára, uprostřed kondenzace, na konci podchlazená kapalina.",s:""},
+{m:"sit",q:"Při servisu velkého chladicího zařízení se 100 kg R134a zjistíš, že nemá systém detekce úniku. Je to v pořádku?",a:["Ne – nad 500 t CO₂e je detekce povinná (143 t to ale ještě není)", "Ano, detekce se nevyžaduje nikdy", "Ne – detekce je povinná od 5 t", "Ano, ale jen u HFO"],e:"100 × 1430 / 1000 = 143 t CO₂e → detekce úniku povinná až od 500 t. Interval kontrol 6 měsíců.",s:""},
+{m:"sit",q:"Zákazník se ptá, proč pájíš s dusíkem. Co odpovíš?",a:["Dusík brání vzniku okují uvnitř trubek, které by ucpaly filtr a ventily", "Dusík chladí pájku", "Dusík zvyšuje pevnost spoje", "Kvůli předpisu o hořlavosti"],e:"Okuje (oxidy mědi) se uvolní a ucpou kapiláru, expanzní ventil nebo síto.",s:""},
+{m:"sit",q:"Nová venkovní jednotka R32 je předplněná na 5 m potrubí, skutečná trasa je 12 m. Výrobce udává 20 g/m. Co uděláš?",a:["Doplním 140 g vážením", "Nic, předplnění stačí", "Doplním 240 g", "Doplním podle tlaku"],e:"(12 − 5) × 20 g = 140 g.",s:""},
+{m:"sit",q:"Při otevření okruhu chladicí vitríny s R290 nemáš odsávačku pro hořlavá chladiva. Co smíš?",a:["Malou náplň HC podle podkladu výrobce vypustit do dobře větraného prostoru bez zdrojů zapálení", "Použít běžnou odsávačku pro HFC", "Rozpájet okruh pod tlakem", "Odsát do láhve od R410A"],e:"Běžná stanice může jiskřit. Propan není F-plyn – malou náplň lze řízeně vypustit venku nebo do větraného prostoru.",s:""},
+{m:"sit",q:"Zákazník má nástěnnou klimatizaci s 0,8 kg R32. Je vyžadován certifikát na její montáž?",a:["Ano – montáž a servis F-plynových zařízení dělá jen certifikovaná osoba", "Ne, pod 3 kg", "Ne, pod 5 t CO₂e", "Jen u hermetických zařízení"],e:"Certifikát se vyžaduje bez ohledu na náplň; pod 3 kg stačí kategorie A2.",s:""},
+{m:"sit",q:"Při uvádění do provozu naměříš na vývěvě 2 000 mikronů a dál to neklesá. Co zkontroluješ nejdřív?",a:["Netěsnost hadic a spojek, olej ve vývěvě, únik v okruhu", "Nic, 2 000 mikronů stačí", "Zvýším teplotu okolí", "Naplním a doladím za provozu"],e:"Cílem je pod ~500 mikronů. Když vakuum nejde níž, bývá vina netěsná hadice, starý olej nebo únik.",s:""},
+{m:"sit",q:"Při práci na střeše najdeš na tlakové láhvi s chladivem prošlou revizi. Co s ní?",a:["Nepoužívat, vrátit dodavateli k přezkoušení", "Použít, chladivo je v pořádku", "Použít jen pro dusík", "Vypustit a vyhodit"],e:"Láhve musí mít platnou tlakovou zkoušku; s prošlou se nesmí pracovat.",s:""},
+{m:"sit",q:"Kompresor se po zapnutí vypíná na vysokotlaký presostat. Ventilátor kondenzátoru stojí. Co je příčina?",a:["Nefunkční ventilátor kondenzátoru – teplo se neodvádí", "Málo chladiva", "Ucpaný filtr na sání", "Vlhkost v okruhu"],e:"Bez proudění vzduchu přes kondenzátor tlak rychle vystoupá.",s:""},
+{m:"sit",q:"Námraza je jen na začátku výparníku a sání je teplé. Co to naznačuje?",a:["Nedostatek chladiva nebo nedostatečný průtok expanzním ventilem", "Přeplnění", "Příliš velký průtok vzduchu", "Vše v pořádku"],e:"Výparník je nedostatečně zaplavený – chladivo se vypaří brzy a zbytek výparníku pracuje s přehřátou párou.",s:""},
+{m:"sit",q:"Na zkoušce dostaneš láhev bez štítku s neznámým chladivem. Co uděláš?",a:["Nepoužiju ji – chladivo musí být identifikováno", "Změřím tlak a odhadnu chladivo", "Použiju na doplnění R410A", "Vypustím ji"],e:"Neznámé nebo smíšené chladivo nelze plnit do zařízení – patří k likvidaci jako směs.",s:""},
+// ───────── doplnění okruhů (v11) ─────────
+{m:"bez",q:"Co uděláš jako první, když v uzavřené strojovně spustí alarm detektoru chladiva?",a:["Opustím prostor a zajistím vyvětrání, vstup až po poklesu koncentrace", "Najdu únik a utěsním ho", "Vypnu detektor", "Zapálím svíčku pro kontrolu průvanu"],e:"Chladiva vytlačují kyslík; u hořlavých hrozí zapálení.",s:""},
+{m:"bez",q:"Proč se tlaková láhev nesmí ohřívat plamenem?",a:["Kapalné chladivo se roztahuje – hrozí přetlak a roztržení láhve", "Chladivo by zmrzlo", "Kvůli GWP", "Kvůli korozi"],e:"Ohřívat jen teplou vodou nebo ohřívacím pásem s regulací, max. cca 50 °C.",s:""},
+{m:"bez",q:"Proč se nesmí plnit dusík do okruhu bez redukčního ventilu?",a:["Láhev má až 200–300 bar – okruh by se mohl roztrhnout", "Dusík by zmrzl", "Kvůli vlhkosti", "Kvůli spotřebě dusíku"],e:"Tlak se reguluje redukčním ventilem a nesmí přesáhnout PS zařízení.",s:""},
+{m:"bez",q:"Proč se okruh nikdy netlakuje kyslíkem nebo stlačeným vzduchem?",a:["Kyslík s olejem může explodovat, vzduch přináší vlhkost a kyslík", "Kyslík je drahý", "Vzduch je toxický", "Kyslík se rozpouští v chladivu"],e:"Na tlakové zkoušky se používá suchý dusík (případně s vodíkem nebo heliem).",s:""},
+{m:"bez",q:"Co je nejbezpečnější při práci na elektrické části klimatizace?",a:["Vypnout, zajistit proti zapnutí, ověřit beznapěťový stav a počkat na vybití kondenzátorů", "Pracovat pod napětím v rukavicích", "Vypnout jen dálkovým ovladačem", "Odpojit jen ventilátor"],e:"Kondenzátory invertorů drží napětí i po vypnutí.",s:""},
+{m:"bez",q:"Kde se hromadí CO₂ a většina HFC chladiv po úniku?",a:["U podlahy a v prohlubních – jsou těžší než vzduch", "Pod stropem", "Rovnoměrně", "Venku"],e:"Výjimkou je čpavek, který stoupá.",s:""},
+{m:"bez",q:"Proč se kapalné chladivo nesmí dostat na kůži?",a:["Prudkým vypařením způsobí omrzliny", "Je radioaktivní", "Je silně kyselé", "Způsobí popáleniny od tepla"],e:"Proto brýle a rukavice; zasažené místo ohřívat vlažnou vodou.",s:""},
+{m:"bez",q:"Při jaké práci jsou ochranné brýle nutné?",a:["Při každém připojování a odpojování hadic a manipulaci s chladivem", "Jen při pájení", "Jen u CO₂", "Nikdy, stačí rukavice"],e:"Stříknutí kapalného chladiva do oka je vážné zranění.",s:""},
+{m:"bez",q:"Co znamená bezpečnostní třída B2L (čpavek)?",a:["Vyšší toxicita a mírná hořlavost", "Netoxický a nehořlavý", "Vysoce hořlavý", "Netoxický a mírně hořlavý"],e:"B = vyšší toxicita, 2L = mírně hořlavé s nízkou rychlostí hoření.",s:""},
+{m:"bez",q:"Jak se má převážet tlaková láhev s chladivem v dodávce?",a:["Zajištěná proti pohybu, ventil chráněný kloboukem, větraný prostor", "Volně ležící", "V kabině u řidiče", "Na slunci na korbě"],e:"Láhve se zajišťují a ventil chrání; vozidlo větrat.",s:""},
+{m:"ene",q:"Co je SEER?",a:["Sezonní chladicí faktor – průměrná účinnost za chladicí sezonu", "Okamžitý chladicí výkon", "Topný faktor", "Spotřeba v kWh"],e:"SEER a SCOP zohledňují proměnné podmínky během roku.",s:""},
+{m:"ene",q:"Jak ovlivní zanesený výparník účinnost?",a:["Klesne výparná teplota, výkon i EER", "Účinnost stoupne", "Neovlivní", "Stoupne kondenzační tlak a účinnost"],e:"Menší prostup tepla → nižší tlak sání → kompresor pracuje s horší účinností.",s:""},
+{m:"ene",q:"Proč snižuje vysoké přehřátí na sání účinnost?",a:["Výparník není plně využit a kompresor nasává řidší páru", "Kompresor nasává kapalinu", "Stoupne podchlazení", "Nesnižuje"],e:"Velké přehřátí = část výparníku jen přehřívá páru místo vypařování.",s:""},
+{m:"ene",q:"Co ušetří nejvíc energie při běžném servisu splitu?",a:["Čisté výměníky a filtry a správná náplň", "Výměna dálkového ovladače", "Nižší nastavená teplota", "Častější odmrazování"],e:"Zanesené výměníky a špatná náplň zhoršují účinnost o desítky procent.",s:""},
+{m:"ene",q:"Tepelné čerpadlo dává 9 kW tepla při příkonu 2,5 kW. Jaký je COP?",a:["3,6", "2,5", "6,5", "0,28"],e:"COP = 9 / 2,5 = 3,6.",s:""},
+{m:"ene",q:"Proč má tepelné čerpadlo vzduch–voda nižší COP v mrazu?",a:["Roste rozdíl mezi výparnou a kondenzační teplotou", "Klesá kondenzační tlak", "Chladivo hoří", "Nemění se"],e:"Větší teplotní zdvih = vyšší kompresní poměr a vyšší příkon.",s:""},
+{m:"ene",q:"Co je EER?",a:["Chladicí výkon dělený elektrickým příkonem", "Topný výkon dělený příkonem", "Příkon dělený výkonem", "Roční spotřeba"],e:"EER = Q chlad / P el.",s:""},
+{m:"ene",q:"Proč šetří energii vyšší teplota přiváděné vody do podlahového topení s TČ? (Pozor – otázka chytá.)",a:["Nešetří – nižší teplota topné vody zvyšuje COP", "Šetří, vyšší teplota = vyšší COP", "Nemá vliv", "Šetří jen v létě"],e:"Čím nižší kondenzační teplota, tím lepší COP – proto nízkoteplotní otopné soustavy.",s:""},
+{m:"pot",q:"Jak se řeže měděná trubka pro chladivo?",a:["Řezákem na trubky, pak odjehlit otvorem dolů", "Pilkou na železo", "Úhlovou bruskou", "Kleštěmi"],e:"Piliny a otřepy v trubce poškodí kompresor a ucpou ventily.",s:""},
+{m:"pot",q:"Proč se konce trubek během montáže zaslepují?",a:["Aby se dovnitř nedostala vlhkost a nečistoty", "Kvůli vzhledu", "Aby neunikl dusík", "Kvůli hluku"],e:"Vlhkost a nečistoty se v okruhu mění na kyseliny a kal.",s:""},
+{m:"pot",q:"Proč se sací potrubí izoluje?",a:["Proti kondenzaci a ztrátám chladu (a zvýšení přehřátí)", "Proti hluku", "Kvůli hořlavosti", "Neizoluje se"],e:"Izolace musí být uzavřená a dostatečně silná, venku odolná UV.",s:""},
+{m:"pot",q:"K čemu je sifon (smyčka) u stoupajícího sacího potrubí?",a:["Zachytí olej, který se pak vynese do kompresoru", "Tlumí hluk", "Odvádí kondenzát", "Brání zamrznutí"],e:"U vyšších stoupaček se olej shromáždí v sifonu a proudem páry je vynesen nahoru.",s:""},
+{m:"pot",q:"Jaký sklon se doporučuje u vodorovného sacího potrubí?",a:["Mírný spád směrem ke kompresoru", "Spád od kompresoru", "Žádný, vodorovně", "Svisle"],e:"Olej pak stéká ke kompresoru.",s:""},
+{m:"pot",q:"Proč se lemový spoj dotahuje momentovým klíčem?",a:["Málo = netěsnost, moc = prasklý lem", "Kvůli záruce na klíč", "Lemy se nedotahují", "Aby šel snadno povolit"],e:"Utahovací moment podle průměru trubky a výrobce.",s:""},
+{m:"pot",q:"Jakou pájku použiješ na spoj měď–měď?",a:["Fosforovou (CuP) bez tavidla", "Cínovou pájku", "Stříbrnou s tavidlem jen", "Lepidlo"],e:"Měď–mosaz nebo ocel: stříbrná pájka s tavidlem.",s:""},
+{m:"pot",q:"Proč musí mít potrubí pro R410A a R32 dostatečnou tloušťku stěny?",a:["Pracovní tlaky jsou o 50–60 % vyšší než u R22", "Kvůli hořlavosti", "Kvůli vibracím", "Kvůli hmotnosti"],e:"Například 1/2\" a 5/8\" trubky v tvrdosti a tloušťce podle tlaku.",s:""},
+{m:"pot",q:"Co hrozí, když se trubka při ohýbání zploští?",a:["Zúžení průřezu – tlaková ztráta a horší výkon", "Nic", "Zvýší se průtok", "Lepší přenos tepla"],e:"Používat ohýbačku se správným poloměrem.",s:""},
+{m:"pot",q:"Jak dlouhé má být potrubí a kolik ohybů?",a:["Co nejkratší s minimem ohybů a spojů", "Libovolně dlouhé", "Čím delší, tím lepší chlazení", "Dlouhé se smyčkami proti vibracím všude"],e:"Každý spoj je potenciální únik; délka zvyšuje tlakovou ztrátu a náplň.",s:""},
+{m:"kom",q:"Na co slouží servisní (Rotalock) ventil kompresoru ve střední poloze?",a:["Okruh je otevřen a servisní přípojka je propojena – lze měřit tlak", "Okruh je uzavřen", "Přípojka je uzavřena", "Odpojí kompresor elektricky"],e:"Zadní poloha = přípojka zavřená, přední = uzavřeno do okruhu, střední = měření.",s:""},
+{m:"kom",q:"Co se stane, když u termostatického expanzního ventilu povolíš (snížíš) nastavení přehřátí?",a:["Ventil víc otevře – přehřátí klesne", "Ventil přivře – přehřátí stoupne", "Nic", "Stoupne kondenzační tlak"],e:"Malé přehřátí riskuje kapalinu v sání; nastavovat po malých krocích a čekat na ustálení.",s:""},
+{m:"kom",q:"K čemu slouží vnější vyrovnání tlaku u TEV?",a:["Vyrovná tlakovou ztrátu výparníku – ventil řídí podle tlaku na výstupu", "Odvádí olej", "Chrání před vysokým tlakem", "Slouží k plnění"],e:"Používá se u výparníků s velkou tlakovou ztrátou nebo s rozdělovačem.",s:""},
+{m:"kom",q:"Kam se umisťuje tykavka TEV?",a:["Na sací potrubí za výparníkem, dobře přiložená a zaizolovaná", "Na kapalinové potrubí", "Na výtlak kompresoru", "Do vzduchu před výparník"],e:"U malých průměrů nahoře, u větších na 4 nebo 8 hodinách – ne dole, kde teče olej.",s:""},
+{m:"kom",q:"Jak se u větších systémů řeší regulace výkonu kompresoru?",a:["Frekvenčním měničem, odlehčením válců nebo více kompresory", "Přivřením sacího ventilu ručně", "Odpojováním ventilátorů", "Nijak"],e:"Plynulá regulace zlepšuje sezonní účinnost a stabilitu teplot.",s:""},
+{m:"kom",q:"Proč je důležitý návrat oleje do kompresoru?",a:["Bez oleje se kompresor zadře – olej se musí vracet sáním", "Olej zvyšuje výkon výparníku", "Olej se v okruhu spotřebovává", "Není důležitý"],e:"Pomáhá dostatečná rychlost v sání, sifony, sklon potrubí, případně odlučovač oleje.",s:""},
+{m:"kom",q:"K čemu slouží odlučovač oleje na výtlaku?",a:["Zachytí olej a vrací ho do kompresoru, aby necirkuloval okruhem", "Odstraňuje vlhkost", "Chladí výtlak", "Snižuje hluk"],e:"Používá se u velkých nebo nízkoteplotních systémů.",s:""},
+{m:"kom",q:"K čemu slouží sběrač kapaliny?",a:["Pojme kapalné chladivo při změnách zatížení a při odčerpání", "Odlučuje olej", "Zvyšuje tlak", "Vysouší chladivo"],e:"Umožňuje i odčerpání (pump-down) náplně do sběrače.",s:""},
+{m:"kom",q:"Co je pump-down?",a:["Odčerpání chladiva do kondenzátoru nebo sběrače zavřením kapalinového ventilu", "Plnění chladiva", "Vakuování", "Odmrazování"],e:"Používá se před servisem nízkotlaké strany nebo jako ochrana při odstávce.",s:""},
+{m:"kom",q:"K čemu slouží ohřev klikové skříně kompresoru?",a:["Brání rozpouštění chladiva v oleji při odstávce", "Ohřívá výtlak", "Odmrazuje výparník", "Zvyšuje COP"],e:"Jinak hrozí pěnění oleje a kapalinové rázy při startu.",s:""},
+{m:"kom",q:"Co chrání kompresor před kapalinou v sání?",a:["Odlučovač kapaliny na sání a správné přehřátí", "Filtrdehydrátor", "Průhledítko", "Sběrač na výtlaku"],e:"Kapalinové rázy ničí ventily a ložiska.",s:""},
+{m:"kom",q:"Co ukazuje průhledítko s indikátorem vlhkosti?",a:["Přítomnost bublin v kapalině a obsah vlhkosti (změnou barvy)", "Tlak v okruhu", "Teplotu kapaliny", "Množství oleje"],e:"Bubliny mohou znamenat nedostatek chladiva nebo škrcení před průhledítkem.",s:""},
+{m:"kom",q:"Co dělá čtyřcestný ventil u tepelného čerpadla?",a:["Přepíná směr toku chladiva mezi chlazením a topením (a odmrazováním)", "Reguluje přehřátí", "Odlučuje olej", "Měří tlak"],e:"Při závadě zůstane v jedné poloze nebo propouští – teplé sání.",s:""},
+{m:"kom",q:"K čemu slouží presostat nízkého tlaku?",a:["Vypne kompresor při příliš nízkém sacím tlaku (únik, námraza)", "Vypne při vysokém tlaku", "Řídí ventilátor", "Měří teplotu"],e:"Chrání kompresor před chodem bez chladiva a výparník před zamrznutím.",s:""},
+{m:"tes",q:"Kolik je 500 mikronů?",a:["Asi 0,67 mbar (67 Pa) absolutně", "5 bar", "500 mbar", "0,5 bar přetlaku"],e:"1 mikron (mTorr) ≈ 0,133 Pa.",s:""},
+{m:"tes",q:"Proč se vakuuje z obou stran okruhu?",a:["Rychlejší a důkladnější odsátí, i přes uzavřené ventily a expanzní prvek", "Kvůli předpisu o hluku", "Aby se nespálila vývěva", "Nevakuuje se"],e:"Kapilára nebo zavřený EEV jinak brání odsátí druhé strany.",s:""},
+{m:"tes",q:"Co dělá olej ve vývěvě, když nasaje hodně vlhkosti?",a:["Ztrácí schopnost dosáhnout hlubokého vakua – vyměnit", "Zlepší vakuum", "Nic", "Zvýší otáčky"],e:"Olej vývěvy měnit pravidelně a po vakuování vlhkých okruhů.",s:""},
+{m:"tes",q:"Proč se při vakuování používají krátké hadice velkého průměru?",a:["Menší odpor – rychlejší a hlubší vakuum", "Kvůli ceně", "Kvůli hořlavosti", "Nemá vliv"],e:"Nejlépe přímo přes vyjmuté jádro Schraderova ventilu.",s:""},
+{m:"tes",q:"Kdy je nutné kontrolu těsnosti zopakovat po opravě úniku?",a:["Do 1 měsíce od opravy", "Do 1 roku", "Při příští pravidelné kontrole", "Nikdy"],e:"Ověřuje se účinnost opravy.",s:""},
+{m:"tes",q:"Proč se kontrola těsnosti dělá i na pojistném ventilu a připojení presostatů?",a:["I tam únik vzniká – kontroluje se celý okruh", "Nemá smysl, nikdy neunikají", "Jen kvůli předpisu", "Jen u CO₂"],e:"Je třeba najít všechna místa úniku, první nemusí být jediné.",s:""},
+{m:"tes",q:"Proč se elektronický detektor úniku pravidelně kontroluje?",a:["Ztrácí citlivost – kontrola alespoň 1× ročně, referenční únik před použitím", "Kvůli baterii", "Nekontroluje se", "Kvůli předpisu o hluku"],e:"Detektor musí být citlivý na dané chladivo.",s:""},
+{m:"tes",q:"Jak se pozná přeplnění recyklační láhve v praxi?",a:["Podle váhy – láhev se vždy plní na váze do max. hmotnosti", "Podle zvuku", "Podle teploty láhve", "Podle manometru"],e:"Tlak v láhvi neukazuje množství kapaliny.",s:""},
 ];
+
 // Lekce: klíčové body ke každému okruhu
 const LESSONS = {
 leg: ["Nařízení (EU) 2024/573 platí od 11. 3. 2024 a nahradilo 517/2014. Certifikaci osob upravuje prováděcí nařízení 2024/2215, v ČR zákon 73/2012 Sb.",
@@ -401,12 +485,17 @@ hor: ["A2L (R32, R454B, R1234yf) mírně hořlavé, rychlost hoření max. 10 cm
 "Zdroje zapálení do 3 m: spínače, stykače, relé, presostaty, motory ventilátorů, termostaty, čerpadla kondenzátu, jističe, povrchy nad 360 °C. Obvody pod napětím nerozpojovat.",
 "Rozpájení: odsát do vakua, 0,1 bar suchého N₂, otevřená hadice, odpájet. Plnit po vakuu, vážit ±5 %. Díly jen stejného typu, rozvaděče znovu utěsnit.",
 "Přeprava: nádoby s hořlavým plynem do 333 kg bez dalších opatření ADR; naplněná zařízení pod 12 kg mimo ADR (max. 1000 ks na vozidlo)."],
+sit: ["Únik se nejdřív najde a opraví, teprve pak tlaková zkouška, vakuum a náplň vážením – žádné „jen doplnit“.",
+"Diagnostika: málo chladiva = nízký sací tlak, velké přehřátí, malé podchlazení. Přeplnění = vysoký kondenzační tlak a velké podchlazení.",
+"Test nárůstu po vakuu: ustálení = vlhkost, trvalý růst = netěsnost. Cíl pod cca 500 mikronů.",
+"Zeotropní směsi (R407C, R448A) plnit kapalinou. Tlakovou zkoušku vyhodnocovat s přepočtem na teplotu."],
 bez: ["OOPP: ochranné brýle a rukavice – kapalné chladivo způsobí omrzliny.",
 "Omrzlinu nemnout, ohřívat vlažnou vodou, k lékaři. Oči ihned vyplachovat.",
 "V plameni nebo na horkém povrchu se HFC rozkládají na toxické látky (fluorovodík).",
 "Lahve převážet zajištěné, ventil chráněný, neohřívat plamenem ani nad cca 50 °C.",
 "Únik i nehořlavého chladiva ve strojovně hrozí udušením u podlahy.",
-"Před zásahem do elektriky vypnout, zajistit proti zapnutí a ověřit beznapěťový stav."],
+"Před zásahem do elektriky vypnout, zajistit proti zapnutí a ověřit beznapěťový stav; kondenzátory invertorů drží napětí i po vypnutí.",
+"Tlakovat jen dusíkem přes redukční ventil – nikdy kyslíkem nebo vzduchem. Láhve neohřívat plamenem."],
 ene: ["EER = chladicí výkon / příkon, COP = topný výkon / příkon; sezonní SEER a SCOP.",
 "Nižší kondenzační teplota o 1 K zlepší účinnost orientačně o 2–4 %; vyšší teplota vypařování také pomáhá.",
 "Čisté výměníky a správná náplň jsou nejlevnější úspora. Námraza na výparníku snižuje výkon.",
@@ -497,9 +586,10 @@ function leakInterval(t,lds,hfoKg){ // vrací měsíce nebo null
 // </calc>
 const $=s=>document.querySelector(s), view=$("#view");
 Q.forEach((q,i)=>q.id=q.m+"-"+i);
-const KEY="fplyny-v1";const A_MODS=["leg","env","fyz","kom","tes","pot","hor","bez","ene"];
+const KEY="fplyny-v1";const A_MODS=["leg","env","fyz","kom","tes","pot","hor","bez","ene","sit"];
 let S={box:{},seen:{},tm:{},mods:Object.keys(MODULES),tests:[]};
 try{const r=localStorage.getItem(KEY); if(r) S=Object.assign(S,JSON.parse(r))}catch(e){}
+if(!(S.modNew||[]).includes("sit")){S.modNew=(S.modNew||[]).concat("sit");if(!S.mods.includes("sit"))S.mods.push("sit")}
 let cloud=null,cloudTimer=null,cloudBusy=false,cloudDirty=false;
 function setSync(t,c){const el=$("#sync");if(!el)return;el.className="sync "+(c||"");el.querySelector("span").textContent=t}
 function save(){S.upd=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
@@ -736,13 +826,37 @@ const PRAX=[
   ["Zabezpeč okruh pro další servis","Okruh bez přetlaku, uzavřené ventily, u HC bez hořlavého plynu."],
   ["Zápis do záznamů zařízení","Druh a množství znovuzískaného chladiva."]]}
 ];
+// ── seřazování pracovních postupů ──
+const ORD=[
+ {t:"Montáž splitu",tip:"Lem a momentový klíč zabrání úniku; bez tlakové zkoušky a vakua se neotvírají ventily.",s:["Umístit a ukotvit jednotky, ověřit spád odvodu kondenzátu","Uříznout trubky řezákem a odjehlit otvorem dolů","Nasadit matice, zalemovat a zkontrolovat lem","Dotáhnout spoje momentovým klíčem","Tlaková zkouška dusíkem a kontrola spojů","Vakuování a test nárůstu tlaku","Otevřít servisní ventily, případně doplnit náplň vážením","Kontrola těsnosti detektorem, čepičky ventilů, zápis"]},
+ {t:"Tlaková zkouška dusíkem",tip:"Nikdy přes PS ze štítku a nikdy bez redukčního ventilu – láhev dusíku má až 200 bar a víc.",s:["Zjistit nejvyšší dovolený tlak PS ze štítku","Připojit láhev přes redukční ventil a manometr","Napouštět postupně až na zkušební tlak","Uzavřít a odpojit láhev, zapsat tlak a teplotu okolí","Zkontrolovat spoje pěnotvorným roztokem a sledovat tlak","Vyhodnotit pokles s přepočtem na teplotu","Dusík bezpečně vypustit do venkovního prostoru"]},
+ {t:"Vakuování a test nárůstu tlaku",tip:"Test nárůstu: ustálení = vlhkost (vakuovat dál), trvalý růst = netěsnost (hledat únik).",s:["Připojit vývěvu krátkými hadicemi a vakuometr k okruhu","Otevřít obě strany okruhu (VT i NT)","Vakuovat pod cca 500 mikronů (0,67 mbar)","Uzavřít ventil k vývěvě a vývěvu vypnout","Sledovat nárůst tlaku 10–15 minut","Vyhodnotit: ustálení = vlhkost, trvalý růst = netěsnost","Vakuum zlomit chladivem a plnit"]},
+ {t:"Znovuzískání do recyklační láhve",tip:"Láhev max. na 80 % objemu kapalinou – na váze, nikdy odhadem. Chladiva nemíchat.",s:["Zkontrolovat láhev: určená pro chladivo, vyvakuovaná, platná zkouška, štítek","Postavit láhev na váhu, zjistit táru a max. náplň","Propojit okruh, odsávačku a láhev, odvzdušnit hadice","Odsát nejdřív kapalinu, potom páru","Hlídat váhu, nepřekročit max. náplň (80 %)","Při dosažení předepsaného podtlaku uzavřít ventily","Zvážit, označit láhev a zapsat množství do záznamů"]},
+ {t:"Lemový spoj",tip:"Matice se nasazuje PŘED lemováním – po zalemování už nejde nasadit.",s:["Uříznout trubku kolmo řezákem","Odjehlit otvorem dolů, aby piliny nepadaly do trubky","Nasadit převlečnou matici","Upnout trubku do lemovacího přípravku na správnou výšku","Zalemovat a zkontrolovat lem (hladký, bez trhlin)","Dotáhnout momentovým klíčem podle výrobce"]},
+ {t:"Tvrdé pájení pod dusíkem",tip:"Dusík během pájení brání okujím uvnitř trubky; při pájení nikdy nesmí být v okruhu chladivo.",s:["Očistit a zasunout trubky se správnou vůlí","Pustit malý průtok suchého dusíku přes redukční ventil","Chránit citlivé díly (ventily, filtr) mokrým hadrem nebo pastou","Rovnoměrně nahřát spoj a přidat pájku","Nechat vychladnout pod dusíkem","Tlaková zkouška spoje"]},
+ {t:"Otevření okruhu s R290",tip:"Hořlavé chladivo: bez zdrojů zapálení do 3 m, detektor, větrání, odsávačka pro hořlavá chladiva, dusík bez kyslíku.",s:["Vypnout a zajistit napájení, odstranit zdroje zapálení do 3 m","Zajistit větrání, detektor hořlavých plynů a hasicí přístroj","Odsát chladivo odsávačkou pro hořlavá chladiva do vyvakuované láhve","Odsávat až do vakua","Napustit cca 0,1 bar suchého dusíku, hadici vyvést ven","Odpájet a vyměnit díl","Zapájet, tlaková zkouška, vakuum a plnění vážením"]}
+];
+let ordI=0,ordPick=[],ordMix=[];
+function ordCard(){return `<div class="card" id="ordcard"><p class="label">Seřaď kroky postupu</p><p class="hint">Klepej na kroky ve správném pořadí. Klepnutím na krok v tvém pořadí ho vrátíš.</p>
+ <div class="chips">${ORD.map((o,i)=>`<button class="chip" data-ord="${i}" aria-pressed="${i===ordI}">${o.t}</button>`).join("")}</div><div id="ordbody"></div></div>`}
+function ordNew(i){ordI=i;ordPick=[];const o=ORD[i];ordMix=o.s.map((_,k)=>k);do{ordMix.sort(()=>Math.random()-.5)}while(ordMix.every((v,k)=>v===k));ordDraw()}
+function ordDraw(res){const o=ORD[ordI],b=$("#ordbody");if(!b)return;
+ b.innerHTML=`<p class="label" style="margin-top:10px">Tvoje pořadí (${ordPick.length}/${o.s.length})</p><div class="opts">${ordPick.map((k,n)=>`<button class="opt${res?(k===n?" ok":" bad"):""}" data-un="${n}"><b>${n+1}</b><span>${esc(o.s[k])}</span></button>`).join("")||`<p class="hint">Zatím nic.</p>`}</div>
+ ${res?"":`<p class="label" style="margin-top:10px">Kroky</p><div class="opts">${ordMix.filter(k=>!ordPick.includes(k)).map(k=>`<button class="opt" data-pk="${k}"><span>${esc(o.s[k])}</span></button>`).join("")}</div>`}
+ ${res?`<div class="expl" style="margin-top:10px;border-left-color:${res.ok?"var(--ok)":"var(--bad)"}"><b>${res.ok?"Správně, celé pořadí sedí.":`Správně ${res.n} z ${o.s.length} pozic.`}</b>${res.ok?"":`<ol style="margin:8px 0 0;padding-left:20px">${o.s.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`}<p style="margin:8px 0 0"><b>Bezpečnost:</b> ${esc(o.tip)}</p></div>
+ <div class="row" style="margin-top:10px"><button class="btn" id="ordagain">Znovu</button><button class="btn ghost" id="ordnext">Další postup</button></div>`:""}`;
+ b.querySelectorAll("[data-pk]").forEach(x=>x.onclick=()=>{ordPick.push(+x.dataset.pk);if(ordPick.length===o.s.length){const n=ordPick.filter((k,i)=>k===i).length;ordDraw({ok:n===o.s.length,n})}else ordDraw()});
+ if(!res)b.querySelectorAll("[data-un]").forEach(x=>x.onclick=()=>{ordPick.splice(+x.dataset.un,1);ordDraw()});
+ if(res){$("#ordagain").onclick=()=>ordNew(ordI);$("#ordnext").onclick=()=>{ordNew((ordI+1)%ORD.length);document.querySelectorAll("[data-ord]").forEach(c=>c.setAttribute("aria-pressed",+c.dataset.ord===ordI))}}}
+function ordBind(){document.querySelectorAll("[data-ord]").forEach(c=>c.onclick=()=>{document.querySelectorAll("[data-ord]").forEach(x=>x.setAttribute("aria-pressed",x===c));ordNew(+c.dataset.ord)});ordNew(ordI)}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px"><div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
+  ordBind();
 }
 // ── kartičky ──
 function cards(){
@@ -767,8 +881,55 @@ function satT(arrT,arrP,p){ // lineární interpolace přetlak -> teplota
   if(p<arrP[0]||p>arrP[arrP.length-1])return null;
   for(let i=1;i<arrP.length;i++){if(p<=arrP[i]){const f=(p-arrP[i-1])/(arrP[i]-arrP[i-1]);return arrT[i-1]+f*(arrT[i]-arrT[i-1])}}return null}
 // </calc2>
+// ── cvičení s výpočty (generovaná čísla, řešení s postupem) ──
+const rnd=(a,b)=>a+Math.random()*(b-a), ri=(a,b)=>Math.floor(rnd(a,b+1)), pick=a=>a[ri(0,a.length-1)];
+const cz=(x,d=2)=>Number(x).toLocaleString("cs-CZ",{maximumFractionDigits:d,minimumFractionDigits:0});
+const nearI=(arr,v)=>arr.reduce((bi,x,i)=>Math.abs(x-v)<Math.abs(arr[bi]-v)?i:bi,0);
+const EXG={
+ co2e:["CO₂ ekvivalent",()=>{const g=pick(GAS.filter(x=>x[1]>0)),kg=+(pick([rnd(0.5,3),rnd(2,15),rnd(10,80)])).toFixed(pick([1,2]));const a=co2e(kg,g[1]);
+  return{t:`Zařízení obsahuje <b>${cz(kg)} kg ${g[0]}</b> (GWP ${g[1]}). Kolik je to t CO₂e?`,a,u:"t CO₂e",tol:Math.max(0.01,a*0.005),st:`t CO₂e = kg × GWP / 1000 = ${cz(kg)} × ${g[1]} / 1000 = <b>${cz(a,2)} t</b>`}}],
+ interval:["Interval kontrol",()=>{const g=pick(GAS.filter(x=>x[1]>0)),kg=+(pick([rnd(0.8,4),rnd(3,30),rnd(20,300)])).toFixed(1),lds=Math.random()<.35,t=co2e(kg,g[1]),m=leakInterval(t,lds);
+  return{t:`<b>${cz(kg,1)} kg ${g[0]}</b> (GWP ${g[1]}), ${lds?"<b>se</b> systémem detekce úniku":"bez systému detekce úniku"}. Jak často je nutná kontrola těsnosti?`,
+  opts:["nepovinná","24 měsíců","12 měsíců","6 měsíců","3 měsíce"],ok:m?`${m} měsíc${m===3?"e":"ů"}`:"nepovinná",
+  st:`${cz(kg,1)} × ${g[1]} / 1000 = <b>${cz(t,2)} t CO₂e</b>. Pásma: pod 5 t nepovinné · 5–50 t 12 měs. · 50–500 t 6 měs. · nad 500 t 3 měs.${lds?" Se systémem detekce se interval zdvojnásobí.":""}${t>=500?" Nad 500 t je detekce úniku povinná.":""}`}}],
+ prehrati:["Přehřátí",()=>{const k=pick(["R410A","R32","R134a","R407C","R454B","R290"]),r=SAT[k],t0i=ri(-8,10),i=nearI(r.t,t0i),p=+r.d[i].toFixed(1),t0=satT(r.t,r.d,p),ts=+(t0+rnd(2,14)).toFixed(1),a=ts-t0;
+  return{t:`${k}: sací tlak <b>${cz(p,1)} bar</b> (přetlak), teplota sacího potrubí <b>${cz(ts,1)} °C</b>. Jaké je přehřátí?`,a,u:"K",tol:0.6,
+  st:`Z tabulky sytosti: ${cz(p,1)} bar přetlak → rosný bod t₀ = <b>${cz(t0,1)} °C</b>. Přehřátí = t sání − t₀ = ${cz(ts,1)} − (${cz(t0,1)}) = <b>${cz(a,1)} K</b>. Teplotu sytosti najdeš v kartě Přehřátí a podchlazení níže.`}}],
+ podchlazeni:["Podchlazení",()=>{const k=pick(["R410A","R32","R134a","R407C","R454B","R290"]),r=SAT[k],tki=ri(35,50),i=nearI(r.t,tki),p=+r.b[i].toFixed(1),tk=satT(r.t,r.b,p),tl=+(tk-rnd(2,10)).toFixed(1),a=tk-tl;
+  return{t:`${k}: kondenzační tlak <b>${cz(p,1)} bar</b> (přetlak), teplota kapalinového potrubí <b>${cz(tl,1)} °C</b>. Jaké je podchlazení?`,a,u:"K",tol:0.6,
+  st:`Z tabulky sytosti: ${cz(p,1)} bar přetlak → bod varu t_k = <b>${cz(tk,1)} °C</b>. Podchlazení = t_k − t kapaliny = ${cz(tk,1)} − ${cz(tl,1)} = <b>${cz(a,1)} K</b>.`}}],
+ cop:["EER / COP",()=>{const heat=Math.random()<.5,q=+rnd(2.5,16).toFixed(1),pe=+(q/rnd(2.6,4.8)).toFixed(2),a=q/pe;
+  return{t:`${heat?"Tepelné čerpadlo dává topný":"Klimatizace dává chladicí"} výkon <b>${cz(q,1)} kW</b> při elektrickém příkonu <b>${cz(pe,2)} kW</b>. Jaký je ${heat?"COP":"EER"}?`,a,u:"",tol:0.05,
+  st:`${heat?"COP = topný":"EER = chladicí"} výkon / příkon = ${cz(q,1)} / ${cz(pe,2)} = <b>${cz(a,2)}</b>`}}],
+ tlak:["Tlaková zkouška",()=>{const p1=ri(20,42),t1=ri(15,30),t2=t1-ri(3,12),pa1=p1+1.013,pa2=pa1*(t2+273.15)/(t1+273.15),a=pa2-1.013;
+  return{t:`Okruh natlakovaný dusíkem na <b>${p1} bar</b> přetlak při <b>${t1} °C</b>. Ráno je <b>${t2} °C</b>. Jaký přetlak má manometr ukázat, je-li okruh těsný?`,a,u:"bar",tol:0.12,
+  st:`Gay-Lussac v absolutních hodnotách: p₂ = p₁ × T₂ / T₁ = (${p1} + 1,013) × (${t2} + 273,15) / (${t1} + 273,15) = ${cz(pa2,2)} bar abs → <b>${cz(a,2)} bar</b> přetlak. Pokles o ${cz(p1-a,2)} bar je jen vliv teploty.`}}],
+ lahev:["Recyklační láhev",()=>{const v=pick([12.5,26.8,61]),[k,rho]=pick([["R410A",1.06],["R32",0.96],["R134a",1.21],["R407C",1.14]]),max=0.8*v*rho,obs=+(rnd(0.1,0.6)*max).toFixed(1),a=max-obs;
+  return{t:`Recyklační láhev <b>${cz(v,1)} l</b>, hustota kapalného ${k} uvaž <b>${cz(rho,2)} kg/l</b>, plnit max. 80 % objemu. V láhvi už je <b>${cz(obs,1)} kg</b>. Kolik kg smíš ještě odsát?`,a,u:"kg",tol:0.15,
+  st:`Max. náplň = 0,8 × ${cz(v,1)} l × ${cz(rho,2)} kg/l = ${cz(max,2)} kg. Zbývá ${cz(max,2)} − ${cz(obs,1)} = <b>${cz(a,2)} kg</b>. V praxi platí údaj na štítku láhve a láhev se plní na váze.`}}],
+ doplneni:["Doplnění náplně",()=>{const pre=pick([5,7,7.5,10]),L=+(pre+rnd(2,18)).toFixed(0),g=pick([15,20,25,30,40]),a=(L-pre)*g;
+  return{t:`Split je z výroby naplněn na <b>${pre} m</b> potrubí, skutečná délka je <b>${L} m</b>. Výrobce udává <b>${g} g/m</b> navíc. Kolik chladiva doplníš?`,a,u:"g",tol:1,
+  st:`(${L} − ${pre}) m × ${g} g/m = <b>${cz(a,0)} g</b>. Plnit vážením, směsi v kapalné fázi.`}}],
+ prevod:["Převody tlaku",()=>{const p=+rnd(0.5,40).toFixed(1),m=pick(["kPa abs","bar abs","MPa abs","kPa"]),f={"kPa abs":[(p+1.013)*100,"(p + 1,013) × 100",1],"bar abs":[p+1.013,"p + 1,013",0.02],"MPa abs":[(p+1.013)/10,"(p + 1,013) / 10",0.002],"kPa":[p*100,"p × 100",1]}[m];
+  return{t:`Manometr ukazuje <b>${cz(p,1)} bar</b> přetlaku. Kolik je to v <b>${m}</b>?`,a:f[0],u:m,tol:f[2],st:`${f[1]} = <b>${cz(f[0],3)} ${m}</b>. 1 bar = 100 kPa = 0,1 MPa; absolutní tlak = přetlak + atmosférický (≈ 1,013 bar).`}}]
+};
+let exKind="vse",exCur=null,exScore=[0,0];
+function exCard(){return `<div class="card" id="excard"><p class="label">Cvičení s výpočty</p><p class="hint">Čísla se pokaždé mění, po kontrole uvidíš postup. Desetinnou čárku piš normálně.</p>
+  <div class="chips">${[["vse","Vše"],...Object.entries(EXG).map(([k,v])=>[k,v[0]])].map(([k,n])=>`<button class="chip" data-exk="${k}" aria-pressed="${exKind===k}">${n}</button>`).join("")}</div><div id="exbody"></div></div>`}
+function exNew(){const k=exKind==="vse"?pick(Object.keys(EXG)):exKind;exCur={k,...EXG[k][1]()};exDraw()}
+function exDraw(){const e=exCur,b=$("#exbody");if(!b)return;
+  b.innerHTML=`<p class="tag" style="align-self:flex-start;margin-top:8px">${EXG[e.k][0]} · správně ${exScore[0]}/${exScore[1]}</p><p style="font-size:17px;line-height:1.45;margin:8px 0">${e.t}</p>
+  ${e.opts?`<div class="opts">${e.opts.map(o=>`<button class="opt" data-exo="${o}">${o}</button>`).join("")}</div>`:
+  `<div class="calc" style="grid-template-columns:1fr auto;align-items:end"><label for="exin">Výsledek${e.u?" ["+e.u+"]":""}<input id="exin" type="text" inputmode="decimal" autocomplete="off"></label><button class="btn" id="exok">Zkontrolovat</button></div>`}
+  <div id="exres"></div>`;
+  const done=ok=>{exScore[1]++;if(ok)exScore[0]++;$("#exres").innerHTML=`<div class="expl" style="border-left-color:${ok?"var(--ok)":"var(--bad)"}"><b>${ok?"Správně.":"Chyba."}</b> ${e.opts?"":`Výsledek: <b>${cz(e.a,e.u==="g"?0:2)} ${e.u}</b>. `}${e.st}</div><button class="btn" id="exnext" style="margin-top:10px;width:100%">Další příklad</button>`;$("#exnext").onclick=exNew;
+    b.querySelectorAll("button.opt,#exok,#exin").forEach(x=>x.disabled=true)};
+  if(e.opts)b.querySelectorAll("[data-exo]").forEach(x=>x.onclick=()=>{const ok=x.dataset.exo===e.ok;x.classList.add(ok?"ok":"bad");if(!ok)b.querySelector(`[data-exo="${e.ok}"]`).classList.add("ok");done(ok)});
+  else{const chk=()=>{const v=parseFloat(String($("#exin").value).replace(/\s/g,"").replace(",","."));if(isNaN(v)){$("#exin").focus();return}done(Math.abs(v-e.a)<=e.tol)};$("#exok").onclick=chk;$("#exin").onkeydown=ev=>{if(ev.key==="Enter")chk()}}
+}
+function exBind(){document.querySelectorAll("[data-exk]").forEach(c=>c.onclick=()=>{exKind=c.dataset.exk;document.querySelectorAll("[data-exk]").forEach(x=>x.setAttribute("aria-pressed",x===c));exNew()});exNew()}
 function calc(){
-  view.innerHTML=`<div class="card"><p class="label">Přehřátí a podchlazení</p>
+  view.innerHTML=exCard()+`<div class="card"><p class="label">Přehřátí a podchlazení</p>
   <div class="calc">
     <label for="ref">Chladivo<select id="ref">${Object.keys(SAT).map(k=>`<option>${k}</option>`).join("")}</select></label>
     <span></span>
@@ -803,6 +964,7 @@ function calc(){
     $("#rsh").innerHTML=t0==null?`<span class="hint">Sací tlak mimo tabulku (${r.t[0]} až ${r.t[r.t.length-1]} °C)</span>`:`<span class="label">Přehřátí</span><span class="v">${f(num("ts")-t0)} K</span><span class="hint">t₀ rosný bod ${f(t0)} °C</span>`;
     $("#rsc").innerHTML=tk==null?`<span class="hint">Kondenzační tlak mimo tabulku${$("#ref").value.startsWith("R744")?" – CO₂ nad 31 °C nekondenzuje (transkritický provoz)":""}</span>`:`<span class="label">Podchlazení</span><span class="v">${f(tk-num("tk"))} K</span><span class="hint">t_k bod varu ${f(tk)} °C</span>`};
   ["ref","ps","ts","pk","tk"].forEach(id=>$("#"+id).addEventListener("input",upd2));upd2();
+  exBind();
 }
 // ── pokrok ──
 let resetArm=false;
