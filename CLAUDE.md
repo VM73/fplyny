@@ -8,7 +8,7 @@ Osobní PWA pro přípravu na přeškolení F-plynů: kat. I/II → A1/A2 a nov�
 - Hotovo když: ikona na ploše iPhonu otevře appku v prohlížeči (ne v aplikaci Claude) a pokrok je stejný na iPhonu i PC.
 
 ## Stack a nasazení
-- `index.html` (vše v jednom; otázky, lekce, tahák, tabulky sytosti CoolProp vložené), `sw.js` (cache `fplyny-N`), `manifest.webmanifest`, ikony (varianta B – modrá rodina).
+- `prez/` obrázky slajdů; `index.html` (vše v jednom; otázky, lekce, tahák, tabulky sytosti CoolProp vložené), `sw.js` (cache `fplyny-N`), `manifest.webmanifest`, ikony (varianta B – modrá rodina).
 - Zdroj se generuje mimo repo (`build.py` + `build_pwa.py`); v repu jen výstup.
 - Supabase JS 2.45.4 z cdn.jsdelivr.net, Publishable key v `index.html`. Nikdy secret / service_role.
 - Nasazení: soubory do kořene repa; zvýšit `VERZE` (viditelné dole v appce) i `CACHE` v `sw.js`.
@@ -27,4 +27,5 @@ Osobní PWA pro přípravu na přeškolení F-plynů: kat. I/II → A1/A2 a nov�
 ## Stav
 - Verze 7: přesun z artefaktu claude.ai na GitHub Pages + Supabase sync.
 - Verze 8: modul Hořlavá chladiva +30 otázek (podklad SCHKT, EN 378), lekce, tahák „Hořlavá chladiva (EN 378)“, slovníček. Nové otázky jsou na konci banky – id stávajících se nemění (id = modul + pořadí).
-- Výukové prezentace jsou samostatné artefakty v Claude: hlavní (48 slajdů) a navazující Hořlavá chladiva.
+- Verze 9: sekce Prezentace – prohlížeč slajdů (WebP 1600×900 v `prez/<id>/NN.webp` + poznámky v `PREZ`), celá obrazovka s otočením na telefonu, „Stáhnout offline“, z lekce okruhu tlačítko „Slajdy k okruhu“ (`PREZ_MAP`). Pozice čtení v localStorage `fplyny-prez` (nesynchronizuje se).
+- Výukové prezentace jsou artefakty v Claude: hlavní (49 slajdů) a Hořlavá chladiva (31). Po změně prezentace: vyrenderovat slajdy (harness render.py) → `make_prez.py` (obrázky + prez.js) → build → push.
