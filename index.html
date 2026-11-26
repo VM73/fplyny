@@ -73,6 +73,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.bad{border-color:var(--bad);background:var(--badbg)}
 .opt:disabled{cursor:default}
 .vacg{width:100%;max-width:460px;display:block;margin:4px auto 0}.vacg .gl{stroke:var(--line);stroke-width:1}.vacg .ax{font:500 9px var(--f-num);fill:var(--muted)}.vacg .lim{stroke:var(--ok);stroke-width:1.2;stroke-dasharray:4 3}.vacg .lim2{fill:var(--ok)}.vacg .cv{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-linejoin:round}
+.prsm{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prsm .vacm b{font-size:26px}.prsm .vacm b.prst{font-size:17px;line-height:1.3}.vacg .exl{fill:none;stroke:var(--muted);stroke-width:1.6;stroke-dasharray:5 4}.vacg .psl{stroke:var(--bad,#d33);stroke-width:1.2;stroke-dasharray:4 3}.vacg .psl2{fill:var(--bad,#d33)}
 .vacm{margin-top:8px;background:#0f1a14;color:#7dffb0;border-radius:12px;padding:10px 14px;display:flex;flex-direction:column;align-items:flex-start;font-family:var(--f-num)}.vacm span{font-size:12px;opacity:.8}.vacm b{font-size:30px;line-height:1.15}.vacm small{font-size:12px;opacity:.85}
 .simg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
 .simv{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;min-width:0}
@@ -161,7 +162,7 @@ dl.gl{margin:0;display:flex;flex-direction:column;gap:4px}dl.gl dt{font-weight:7
 
   </nav>
   <main id="view"></main>
-  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 16.</p>
+  <p class="note">Otázky jsou sestavené z nařízení 2024/573, prov. nař. 2024/2215, zák. 73/2012 Sb. a EN 378. Nejde o oficiální zkušební otázky. Pokrok se ukládá v tomto zařízení a po přihlášení i k účtu. verze 17.</p>
 </div>
 
 <script>
@@ -465,6 +466,14 @@ const Q = [
 {m:"env",q:"Proč se regulují HFC, když nepoškozují ozonovou vrstvu?",a:["Nemají chlor (ODP 0), ale jsou to silné skleníkové plyny s vysokým GWP", "Protože jsou hořlavé", "Protože jsou jedovaté", "Regulují se jen kvůli ceně"],e:"Látky poškozující ozon (CFC, HCFC) řeší samostatné nařízení 2024/590.",s:"příloha I, okruh 2"},
 {m:"env",q:"Pro jaký časový horizont se uvádí GWP v nařízení 2024/573?",a:["100 let", "20 let", "10 let", "500 let"],e:"GWP vyjadřuje oteplovací účinek 1 kg plynu za 100 let v porovnání s 1 kg CO₂.",s:"příloha I, okruh 2"},
 {m:"env",q:"Co vzniká v atmosféře rozkladem některých HFO (např. R1234yf)?",a:["Kyselina trifluoroctová (TFA) – velmi stálá látka hromadící se ve vodě", "Ozon", "Oxid uhelnatý", "Nic, rozkládají se na vodu a CO₂"],e:"Proto se i u HFO s nízkým GWP sleduje dopad na prostředí a diskutuje se o PFAS.",s:"příloha I, okruh 2"},
+{m:"tes",q:"Proč se při přepočtu tlakové zkoušky na teplotu dosazují absolutní hodnoty?",a:["Vztah p₁/T₁ = p₂/T₂ platí jen pro absolutní tlak (přetlak + ≈1 bar) a teplotu v kelvinech", "Kvůli zaokrouhlení", "Manometry ukazují absolutní tlak", "Absolutní hodnoty se používají jen u CO₂"],e:"Manometr ukazuje přetlak. K němu se přičte atmosférický tlak (≈1,013 bar) a k °C se přičte 273,15. S přetlakem a °C by výsledek vyšel špatně, u nízkých teplot i nesmyslně.",s:"příloha I, okruh 4"},
+{m:"tes",q:"Tlaková zkouška: večer 40,0 bar při 22 °C, ráno 39,0 bar při 20 °C. Jak ji vyhodnotíš?",a:["Netěsnost – přepočtený tlak je ≈39,7 bar, chybí asi 0,7 bar", "Těsný – pokles způsobilo ochlazení", "Těsný – rozdíl 1 bar je v toleranci", "Nelze vyhodnotit bez vakua"],e:"(40 + 1,013) × 293,15 / 295,15 = 40,73 bar abs → 39,72 bar přetlak. Ochlazení o 2 K vysvětlí jen asi 0,3 bar, zbytek je únik. Hledat pěnotvorným roztokem, opravit a zkoušku zopakovat.",s:"příloha I, okruh 4"},
+{m:"tes",q:"Natlakováno na 35,0 bar při 18 °C. Odpoledne má potrubí 34 °C a manometr ukazuje 36,9 bar. Co z toho plyne?",a:["Okruh je těsný – přepočtený tlak je ≈37,0 bar, nárůst je jen ohřátím", "Do okruhu se dostal vzduch", "Netěsnost – tlak se nemá měnit", "Manometr je vadný"],e:"(35 + 1,013) × 307,15 / 291,15 = 37,99 bar abs → 36,98 bar přetlak. Naměřený tlak odpovídá. Při natlakování blízko PS ale hrozí, že ohřátím tlak PS přesáhne.",s:"příloha I, okruh 4"},
+{m:"tes",q:"K čemu slouží při hledání netěsnosti směs 95 % dusíku a 5 % vodíku (formovací plyn)?",a:["Vodík je malá molekula, projde i drobným únikem a najde ho elektronický detektor vodíku; směs není hořlavá", "Vodík zvyšuje tlak v okruhu", "Směs vysuší okruh místo vakuování", "Vodík zabarví místo úniku"],e:"Formovací plyn 95/5 se používá jako zkušební plyn pro detektory vodíku. Do okruhu se nesmí dávat čistý vodík ani kyslík.",s:"příloha I, okruh 4"},
+{m:"tes",q:"Venkovní potrubí je na slunci, teplotu měříš ve stínu u vnitřní jednotky. Tlak vychází vyšší, než odpovídá změřené teplotě. Co uděláš?",a:["Zkoušku nevyhodnotím – zopakuji při stálé teplotě a teplotu měřím na potrubí", "Okruh je těsný, tlak je dokonce vyšší", "Upustím dusík na původní tlak", "Zapíšu jako netěsný"],e:"Dusík v okruhu přibýt nemůže – vyšší tlak znamená, že plyn je teplejší, než ukazuje čidlo. Ohřátí může schovat i únik, proto měření při nestálé teplotě neplatí.",s:"příloha I, okruh 4"},
+{m:"tes",q:"Jaký nejvyšší tlak smíš použít při tlakové zkoušce dusíkem na místě instalace?",a:["Nejvýš PS ze štítku (nebo zkušební tlak výrobce); díly s nižším PS se oddělí", "Vždy 1,5 × PS", "Plný tlak láhve s dusíkem", "Libovolný, dusík je inertní"],e:"PS je nejvyšší dovolený tlak zařízení. Snímače, presostaty nebo díly nízkotlaké strany s nižším PS se při zkoušce oddělí nebo zkouší zvlášť. Pozor na ohřátí – tlak roste s teplotou.",s:"příloha I, okruh 3"},
+{m:"tes",q:"Co patří do záznamu o tlakové zkoušce dusíkem?",a:["Zkušební tlak, teploty a časy začátku a konce, doba, použitý plyn, výsledek a kdo zkoušku provedl", "Jen výsledek „těsný“", "Jen cena dusíku", "Nic, zapisuje se jen plnění chladivem"],e:"Záznam dokládá, že okruh byl před vakuováním a plněním ověřen. Bez teplot nejde výsledek zpětně přepočítat.",s:"příloha I, okruh 3"},
+{m:"tes",q:"Proč se dusík po tlakové zkoušce vypouští do venkovního prostoru, ne do malé místnosti?",a:["Dusík vytěsní kyslík a hrozí udušení – nemá zápach ani barvu, nic nevarují", "Dusík je jedovatý", "Dusík je hořlavý", "Kvůli hluku"],e:"V malém nevětraném prostoru může únik dusíku snížit obsah kyslíku pod bezpečnou mez bez jakéhokoli varování. Hadici vyvést ven a vypouštět pozvolna.",s:"příloha I, okruh 11"},
 ];
 
 // Okruhy přílohy I prov. nař. (EU) 2024/2215 a přiřazení otázek.
@@ -508,6 +517,8 @@ const OKR_OVR = {
   125:7,127:8,204:8,
   // verze 13
   243:7,244:7,245:7,246:7,247:7,248:7,249:8,250:8,251:8,252:8,253:8,254:8,255:6,256:6,257:6,258:6,259:6,
+  // verze 17 – tlaková zkouška dusíkem
+  264:4,265:4,266:4,267:4,268:4,269:3,270:3,271:11,
   // sit
   163:4,167:4,168:4,170:7,171:7,172:9,173:11,174:1,175:5,176:1,177:12,178:5,179:4,180:4,
   182:7,183:4,184:10,186:12,187:1,189:5,190:7,191:9,192:5
@@ -1108,12 +1119,12 @@ function vacGraph(c,ph,tt){ // ph 0 vakuování (log), 1 test (lineární)
  <polyline points="${pts.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ")}" class="cv"/></svg>`}
 function vacDraw(pickId,anim){const c=vacCur,b=$("#vacbody");if(!b||!c)return;const ans=pickId!=null,ok=ans&&pickId===c.f,F=VAC[c.f];
  b.innerHTML=`<p class="tag" style="display:inline-block;margin-top:8px">${esc(c.clue.split(",")[0])} · správně ${vacScore[0]}/${vacScore[1]}</p>
- <div class="vacm"><span id="vacph">Vakuování</span><b id="vacu">760 000</b><small id="vacmb">µm Hg · 1 013 mbar</small></div>
+ <div class="vacm"><span id="vacph">Vakuování</span><b id="vacu">760 000</b><small id="vacmb">µm Hg · 1 013 mbar</small><small id="vacbar">1,01 bar abs · 101 325 Pa</small></div>
  <p class="label" style="margin:8px 0 0">1. Vakuování</p><div id="vacg0"></div>
  <p class="label" style="margin:6px 0 0">2. Test nárůstu tlaku – vývěva vypnutá, ventil zavřený</p><div id="vacg1"></div>
  <div id="vacrest"></div>`;
  const step=(t0,t1)=>{$("#vacg0").innerHTML=vacGraph(c,0,t0);$("#vacg1").innerHTML=vacGraph(c,1,t1);
-  const u=t1>0?c.rise(t1):c.vac(t0);$("#vacu").textContent=umF(u);$("#vacmb").textContent=`µm Hg · ${cz(mbar(u),u<7500?2:0)} mbar · ${cz(u*0.13332,0)} Pa`;$("#vacph").textContent=t1>0?`Test nárůstu · ${cz(t1,1)} min`:t0>=c.tv?"Ventil zavřen":`Vakuování · ${Math.round(t0)} min`};
+  const u=t1>0?c.rise(t1):c.vac(t0);$("#vacu").textContent=umF(u);$("#vacmb").textContent=`µm Hg · ${cz(mbar(u),u<7500?2:0)} mbar`;$("#vacbar").textContent=`${Number(mbar(u)/1000).toLocaleString("cs-CZ",{maximumSignificantDigits:3})} bar abs · ${cz(u*0.13332,0)} Pa`;$("#vacph").textContent=t1>0?`Test nárůstu · ${cz(t1,1)} min`:t0>=c.tv?"Ventil zavřen":`Vakuování · ${Math.round(t0)} min`};
  const rest=()=>{const r=$("#vacrest");r.innerHTML=`<p class="hint" style="margin:8px 0 0"><b>Situace:</b> ${esc(c.clue)} Nárůst za posledních 5 min: <b>${umF(c.d5)} µm</b>.</p>
   <p class="label" style="margin-top:12px">${ans?"Výsledek":"Co z toho vyvodíš?"}</p>
   <div class="opts">${VAC_ORD.map(id=>{const cls=ans?(id===c.f?" ok":id===pickId?" bad":""):"";return `<button class="opt${cls}" data-vac="${id}"${ans?" disabled":""}><span>${esc(VAC[id].n)}</span></button>`}).join("")}</div>
@@ -1132,14 +1143,74 @@ function vacDraw(pickId,anim){const c=vacCur,b=$("#vacbody");if(!b||!c)return;co
   if(k<=25)step(c.tv*k/25,0);else if(k<=N)step(c.tv,15*(k-25)/(N-25));else{clearInterval(vacTimer);rest()}},60)}
 function vacCard(){return `<div class="card" id="vaccard"><p class="label">Vakuum a test nárůstu tlaku</p><p class="hint">Split, nové potrubí po tlakové zkoušce. Sleduj vakuometr a z průběhu po zavření ventilu urči stav okruhu.</p><div id="vacbody"></div></div>`}
 function vacBind(){if(vacCur)vacDraw(null,false);else vacNew()}
+// ── tlaková zkouška dusíkem s přepočtem na teplotu ──
+// p₂ = p₁ × T₂ / T₁ v absolutních hodnotách (bar abs, K). Modelové hodnoty, tolerance měření ±0,2 bar.
+const PRS_SYS=[{n:"Split R32",ps:41.5,pz:[38,40,41]},{n:"Split R410A",ps:41.5,pz:[38,40,41]},{n:"Vitrína R134a",ps:25,pz:[20,22,24]}];
+const PRS={
+ ok:{n:"Těsný – změna odpovídá teplotě",o:4,
+  e:c=>`Naměřený tlak se od přepočteného liší jen o ${cz(Math.abs(c.d),1)} bar, to je v přesnosti měření. ${c.t2<c.t1?"Pokles":c.t2>c.t1?"Nárůst":"Malá změna"} je jen vliv teploty, okruh je těsný. Postup: zapsat tlaky, teploty a časy, dusík vypustit do venkovního prostoru, pokračovat vakuováním.`},
+ net:{n:"Netěsný – hledat únik",o:4,
+  e:c=>`Naměřený tlak je o ${cz(-c.d,1)} bar nižší, než odpovídá teplotě. ${c.t2>c.t1?"Pozor: oteplením měl tlak stoupnout, takže stejný nebo nižší tlak znamená únik, který teplota maskuje.":c.t2<c.t1?"Ochlazení vysvětlí jen část poklesu, zbytek je únik.":"Teplota se nezměnila, pokles je únik."} Postup: zkontrolovat spoje pěnotvorným roztokem (lemy, servisní ventily, pájené spoje), opravit, zopakovat tlakovou zkoušku.`},
+ nest:{n:"Nelze vyhodnotit – zopakovat při stálé teplotě",o:4,
+  e:c=>`Tlak je o ${cz(c.d,1)} bar vyšší, než odpovídá změřené teplotě. Dusík v okruhu přibýt nemůže, takže změřená teplota neodpovídá skutečné teplotě plynu – část potrubí je na slunci. Z takového měření nelze těsnost potvrdit ani vyloučit (únik se může schovat za ohřátí). Postup: měřit teplotu na potrubí, zopakovat při stálých podmínkách (ráno, zataženo, ve stínu), případně prodloužit zkoušku.`},
+ ps:{n:"Tlak přesáhl PS – ihned upustit",o:3,
+  e:c=>`Okruh je natlakovaný téměř na PS v chladnu a ohřátím tlak vystoupal na ${cz1(c.p2)} bar, nad PS ${cz1(c.ps)} bar ze štítku. Hrozí poškození dílů nebo pojistného prvku. Postup: tlak hned upustit pod PS, zkoušet při tlaku s rezervou nebo při stálé teplotě; zkušební tlak nikdy nesmí překročit PS.`}
+};
+const PRS_ORD=["ok","net","nest","ps"];
+let prsCur=null,prsScore=[0,0];
+const prsExp=(c,T)=>(c.p1+1.013)*(T+273.15)/(c.t1+273.15)-1.013;
+function prsNew(){const f=pick(PRS_ORD),s=f==="ps"?pick(PRS_SYS.slice(0,2)):pick(PRS_SYS),c={f,s:s.n,ps:s.ps};
+ c.dur=pick([12,14,16,24]);c.h1=pick([16,17,18]);c.h2=(c.h1+c.dur)%24;
+ if(f==="ps"){c.p1=+(s.ps-rnd(0.3,0.8)).toFixed(1);c.t1=ri(3,9);c.t2=c.t1+ri(22,30);c.h1=pick([6,7]);c.dur=pick([6,7,8]);c.h2=c.h1+c.dur}
+ else{c.p1=pick(s.pz);const sub=f==="net"?pick(["warm","cool","same"]):f==="nest"?"warm":pick(["warm","cool"]);
+  c.t1=ri(12,26);c.t2=sub==="warm"?c.t1+ri(3,8):sub==="cool"?c.t1-ri(4,12):c.t1+ri(-1,1);
+  const mg=f==="nest"?2.2:0.3;while(prsExp(c,c.t2)>c.ps-mg){c.p1-=1;} }
+ c.pe=prsExp(c,c.t2);
+ const off=f==="net"?-rnd(0.6,2.0):f==="nest"?rnd(0.9,1.8):rnd(-0.08,0.08);
+ c.p2=Math.round((c.pe+off)*10)/10;c.d=c.p2-c.pe;
+ c.meas=t=>prsExp(c,c.t1+(c.t2-c.t1)*t/c.dur)+off*t/c.dur;
+ c.clue=f==="nest"?`Teplotní čidlo visí ve stínu u vnitřní jednotky, venkovní potrubí a jednotka jsou od rána na přímém slunci.`:
+  f==="ps"?`Natlakováno brzy ráno na studené střeše, odpoledne svítí slunce na jednotku i potrubí.`:
+  `Teplota měřena na potrubí, podmínky stálé (${c.t2<c.t1?"přes noc se ochladilo":c.t2>c.t1?"oteplilo se, potrubí ve stínu":"teplota skoro stejná"}).`;
+ prsCur=c;prsDraw(null)}
+const hh=h=>String(h%24).padStart(2,"0")+":00";
+function prsGraph(c){const W=320,H=150,L=40,R=8,T=10,B=24,iw=W-L-R,ih=H-T-B,N=40;
+ const ex=[],me=[];for(let i=0;i<=N;i++){const t=i/N*c.dur;ex.push([t,prsExp(c,c.t1+(c.t2-c.t1)*t/c.dur)]);me.push([t,c.meas(t)])}
+ const all=[...ex,...me].map(p=>p[1]).concat(c.f==="ps"?[c.ps]:[]);let lo=Math.floor(Math.min(...all)-0.5),hi=Math.ceil(Math.max(...all)+0.5);
+ const x=t=>L+t/c.dur*iw,y=p=>T+(hi-p)/(hi-lo)*ih,st=hi-lo>6?2:1,ticks=[];for(let v=lo;v<=hi;v+=st)ticks.push(v);
+ const pl=a=>a.map(p=>x(p[0]).toFixed(1)+","+y(p[1]).toFixed(1)).join(" ");
+ const psl=c.ps<=hi?`<line x1="${L}" x2="${W-R}" y1="${y(c.ps)}" y2="${y(c.ps)}" class="psl"/><text x="${L+4}" y="${y(c.ps)-3}" class="ax psl2">PS ${cz1(c.ps)} bar</text>`:"";
+ return `<svg viewBox="0 0 ${W} ${H}" class="vacg" role="img" aria-label="Průběh tlakové zkoušky">
+ ${ticks.map(v=>`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" class="gl"/><text x="${L-4}" y="${y(v)+3}" class="ax" text-anchor="end">${v}</text>`).join("")}
+ ${[0,c.dur/2,c.dur].map((t,i)=>`<text x="${x(t)}" y="${H-8}" class="ax" text-anchor="${i===2?"end":i?"middle":"start"}">${i===2?c.dur+" h":hh(Math.floor(c.h1+t))}</text>`).join("")}
+ ${psl}<polyline points="${pl(ex)}" class="exl"/><polyline points="${pl(me)}" class="cv"/></svg>
+ <p class="note" style="margin:2px 0 0"><span style="color:var(--accent)">━</span> naměřený přetlak · <span style="color:var(--muted)">┅</span> přepočtený (těsný okruh) · bar</p>`}
+function prsDraw(pickId){const c=prsCur,b=$("#prsbody");if(!b||!c)return;const ans=pickId!=null,ok=ans&&pickId===c.f,F=PRS[c.f];
+ const pa1=c.p1+1.013,T1=c.t1+273.15,T2=c.t2+273.15,pa2=c.pe+1.013;
+ b.innerHTML=`<p class="tag" style="display:inline-block;margin-top:8px">${esc(c.s)} · PS ${cz1(c.ps)} bar · správně ${prsScore[0]}/${prsScore[1]}</p>
+ <div class="prsm"><div class="vacm"><span>Začátek ${hh(c.h1)}</span><b>${cz1(c.p1)}</b><small>bar přetlak</small><small><b class="prst">${c.t1} °C</b></small></div>
+ <div class="vacm"><span>Konec ${hh(c.h2)} · ${c.dur} h</span><b>${cz1(c.p2)}</b><small>bar přetlak</small><small><b class="prst">${c.t2} °C</b></small></div></div>
+ <p class="hint" style="margin:8px 0 0"><b>Situace:</b> ${esc(c.clue)}</p>
+ <p class="label" style="margin-top:12px">${ans?"Výsledek":"Jak zkoušku vyhodnotíš?"}</p>
+ <div class="opts">${PRS_ORD.map(id=>{const cls=ans?(id===c.f?" ok":id===pickId?" bad":""):"";return `<button class="opt${cls}" data-prs="${id}"${ans?" disabled":""}><span>${esc(PRS[id].n)}</span></button>`}).join("")}</div>
+ ${ans?`<div class="expl${ok?"":" wrong"}" style="margin-top:10px"><b>${ok?"Správně.":"Ne – je to: "+esc(F.n)+"."}</b> <span class="tag">okruh ${F.o}</span>
+  <p style="margin:6px 0 0">${esc(F.e(c))}</p>
+  <p style="margin:6px 0 0"><b>Přepočet:</b> p₂ = p₁ × T₂ / T₁ = (${cz1(c.p1)} + 1,013) × (${c.t2} + 273,15) / (${c.t1} + 273,15) = ${cz(pa1,3)} × ${cz(T2,2)} / ${cz(T1,2)} = ${cz(pa2,2)} bar abs → <b>${cz(c.pe,2)} bar</b> přetlak. Naměřeno ${cz1(c.p2)} bar, rozdíl <b>${c.d>=0?"+":""}${cz(c.d,2)} bar</b> (přesnost měření ±0,2 bar).</p>
+  ${prsGraph(c)}</div>
+  <div class="row" style="margin-top:10px"><button class="btn" id="prsnext">Další zkouška</button><button class="btn ghost" id="prsokr">Procvičit okruh ${F.o}</button></div>
+  <p class="note">Okruh ${F.o}: ${esc(OKRUHY[F.o])}. Vodítko: přepočtený = naměřený → těsný · naměřený nižší → únik · naměřený vyšší → špatně změřená teplota · nad PS → upustit. Hodnoty jsou modelové, doba a zkušební tlak podle výrobce.</p>`:""}`;
+ if(!ans)b.querySelectorAll("[data-prs]").forEach(x=>x.onclick=()=>{prsScore[1]++;if(x.dataset.prs===c.f)prsScore[0]++;prsDraw(x.dataset.prs)});
+ else{$("#prsnext").onclick=prsNew;$("#prsokr").onclick=()=>{document.querySelectorAll("#nav button").forEach(n=>n.setAttribute("aria-pressed",n.dataset.v==="learn"));okrPractice(F.o)}}}
+function prsCard(){return `<div class="card" id="prscard"><p class="label">Tlaková zkouška dusíkem</p><p class="hint">Přepočti tlak na teplotu v absolutních hodnotách (p₁/T₁ = p₂/T₂) a rozhodni, jestli okruh drží.</p><div id="prsbody"></div></div>`}
+function prsBind(){if(prsCur)prsDraw(null);else prsNew()}
 function prax(){
-  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${vacCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px">${schCard()}${simCard()}${prsCard()}${vacCard()}${ordCard()}<div class="card"><p class="label">Praktická zkouška</p><p class="hint">Úkoly ze vzorového zkušebního řádu. Projdi si každý krok nahlas, jako bys ho popisoval komisi. Odškrtnutí se pamatuje v tomto prohlížeči.</p></div>
   ${PRAX.map((t,ti)=>`<div class="card"><p class="label">${esc(t.t)}</p><div class="opts">${t.s.map((x,si)=>{const id="p"+ti+"-"+si,on=(S.prax||{})[id];
    return `<button class="opt${on?" ok":""}" data-p="${id}"><b>${on?"✓":si+1}</b><span><strong>${esc(x[0])}</strong>${x[1]?`<br><span class="hint">${esc(x[1])}</span>`:""}</span></button>`}).join("")}</div></div>`).join("")}
   <button class="btn ghost" id="pr">Zrušit odškrtnutí</button></div>`;
   view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{S.prax=S.prax||{};S.prax[b.dataset.p]=!S.prax[b.dataset.p];save();prax()});
   $("#pr").onclick=()=>{S.prax={};save();prax()};
-  schBind();simBind();vacBind();ordBind();
+  schBind();simBind();prsBind();vacBind();ordBind();
 }
 // ── kartičky ──
 function cards(){
